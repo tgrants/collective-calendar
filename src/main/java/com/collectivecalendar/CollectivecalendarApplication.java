@@ -1,13 +1,13 @@
-package com.oop.kopigslaikaplanotajs;
+package com.collectivecalendar;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class KopigslaikaplanotajsApplication {
+public class CollectivecalendarApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(KopigslaikaplanotajsApplication.class, args);
+		SpringApplication.run(CollectivecalendarApplication.class, args);
 	}
 
 }
