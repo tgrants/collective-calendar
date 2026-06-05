@@ -22,7 +22,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ccdb
       - SPRING_DATASOURCE_USERNAME=ccuser
       - SPRING_DATASOURCE_PASSWORD=ccpass
-      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=validate
     depends_on:
       - postgres-db
     networks:
