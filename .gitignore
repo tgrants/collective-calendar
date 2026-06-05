@@ -1,7 +1,6 @@
 # Build tools and project outputs
 
 target/
-.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
