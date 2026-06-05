@@ -1,0 +1,65 @@
+CREATE TABLE users (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	username VARCHAR(50) NOT NULL UNIQUE,
+	email VARCHAR(100) NOT NULL UNIQUE,
+	verified BOOLEAN NOT NULL DEFAULT FALSE,
+	password VARCHAR(255) NOT NULL,
+	calendar_notify BOOLEAN NOT NULL DEFAULT TRUE,
+	invite_notify BOOLEAN NOT NULL DEFAULT TRUE
+);
+
+CREATE TABLE groups (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	name VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE events (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	name VARCHAR(150) NOT NULL,
+	start_time TIMESTAMP WITH TIME ZONE NOT NULL,
+	end_time TIMESTAMP WITH TIME ZONE NOT NULL,
+	frequency VARCHAR(50),
+	until TIMESTAMP WITH TIME ZONE
+);
+
+CREATE TABLE notify (
+	user_uid UUID REFERENCES users(uid) ON DELETE CASCADE,
+	event_uid UUID REFERENCES events(uid) ON DELETE CASCADE,
+	notify_email BOOLEAN NOT NULL DEFAULT TRUE,
+	notify_inapp BOOLEAN NOT NULL DEFAULT TRUE,
+	PRIMARY KEY (user_uid, event_uid)
+);
+
+CREATE TABLE notifications (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	notify_user_uid UUID NOT NULL,
+	notify_event_uid UUID NOT NULL,
+	type VARCHAR(50) NOT NULL,
+	status VARCHAR(50) NOT NULL,
+	retries INT NOT NULL DEFAULT 0,
+	seen BOOLEAN NOT NULL DEFAULT FALSE,
+	CONSTRAINT fk_notification_notify FOREIGN KEY (notify_user_uid, notify_event_uid) 
+		REFERENCES notify(user_uid, event_uid) ON DELETE CASCADE
+);
+
+CREATE TABLE invites (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+	user_id UUID NOT NULL REFERENCES users(uid) ON DELETE CASCADE,
+	group_id UUID NOT NULL REFERENCES groups(uid) ON DELETE CASCADE,
+	status VARCHAR(50) NOT NULL DEFAULT 'PENDING',
+	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE user_groups (
+	user_id UUID REFERENCES users(uid) ON DELETE CASCADE,
+	group_id UUID REFERENCES groups(uid) ON DELETE CASCADE,
+	role VARCHAR(50) NOT NULL DEFAULT 'MEMBER',
+	notify BOOLEAN NOT NULL DEFAULT TRUE,
+	PRIMARY KEY (user_id, group_id)
+);
+
+CREATE TABLE group_events (
+	group_id UUID REFERENCES groups(uid) ON DELETE CASCADE,
+	event_id UUID REFERENCES events(uid) ON DELETE CASCADE,
+	PRIMARY KEY (group_id, event_id)
+);
