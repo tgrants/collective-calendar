@@ -28,6 +28,15 @@ services:
     networks:
       - cc-net
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: mailpit_container
+    ports:
+      - "1025:1025" # SMTP server port
+      - "8025:8025" # Web UI port
+    networks:
+      - cc-net
+
 volumes:
   postgres_data:
 
