@@ -1,11 +1,17 @@
-# Kopīgs Laika Plānotājs – Setup Guide
+# Collective Calendar
+
+## Docker
+
+- `docker compose up`
+
+## Windows
 
 This is a Spring Boot MVC project.  
 Follow these steps to set up the environment on Windows.
 
 ---
 
-# 1. Java Setup
+### 1. Java Setup
 
 You need to download and install:
 
@@ -25,7 +31,7 @@ javac -version
 
 ---
 
-## Alternative (if you have admin rights)
+#### Alternative (if you have admin rights)
 
 If you have administrator rights, you can install Java using the official installer instead of the ZIP version.  
 The installer will automatically configure environment variables for you.
@@ -35,7 +41,7 @@ https://download.oracle.com/java/25/latest/jdk-25_windows-x64_bin.exe
 
 ---
 
-# 2. Maven Setup
+### 2. Maven Setup
 
 You need to download and install:
 
@@ -54,7 +60,7 @@ mvn -v
 
 ---
 
-# 3. Run the Project
+### 3. Run the Project
 
 Navigate to the project folder and run:
 
@@ -62,7 +68,7 @@ mvn spring-boot:run
 
 ---
 
-# 4. Open Application
+### 4. Open Application
 
 Open in browser:
 
@@ -70,7 +76,7 @@ http://localhost:8080
 
 ---
 
-# 5. Tech Stack
+### 5. Tech Stack
 
 - Spring Boot MVC  
 - Spring Security  
@@ -81,7 +87,7 @@ http://localhost:8080
 
 ---
 
-# 6. Useful Commands
+### 6. Useful Commands
 
 Build project:
 mvn clean install
@@ -91,7 +97,7 @@ mvn spring-boot:run
 
 ---
 
-# 7. Notes
+### 7. Notes
 
 - DevTools enables automatic restart on code changes  
 - H2 database is in-memory (data resets on restart)  

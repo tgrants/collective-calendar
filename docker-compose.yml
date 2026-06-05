@@ -1,0 +1,36 @@
+services:
+  postgres-db:
+    image: postgres:17-alpine
+    container_name: cc_db
+    environment:
+      POSTGRES_DB: ccdb
+      POSTGRES_USER: ccuser
+      POSTGRES_PASSWORD: ccpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cc-net
+
+  spring-app:
+    build: .
+    container_name: cc_dev
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-db:5432/ccdb
+      - SPRING_DATASOURCE_USERNAME=ccuser
+      - SPRING_DATASOURCE_PASSWORD=ccpass
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+    depends_on:
+      - postgres-db
+    networks:
+      - cc-net
+
+volumes:
+  postgres_data:
+
+networks:
+  cc-net:
+    driver: bridge
