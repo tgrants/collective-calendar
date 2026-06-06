@@ -23,11 +23,11 @@ CREATE TABLE events (
 );
 
 CREATE TABLE notify (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	user_uid UUID REFERENCES users(uid) ON DELETE CASCADE,
 	event_uid UUID REFERENCES events(uid) ON DELETE CASCADE,
 	notify_email BOOLEAN NOT NULL DEFAULT TRUE,
-	notify_inapp BOOLEAN NOT NULL DEFAULT TRUE,
-	PRIMARY KEY (user_uid, event_uid)
+	notify_inapp BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE notifications (
@@ -38,8 +38,7 @@ CREATE TABLE notifications (
 	status VARCHAR(50) NOT NULL,
 	retries INT NOT NULL DEFAULT 0,
 	seen BOOLEAN NOT NULL DEFAULT FALSE,
-	CONSTRAINT fk_notification_notify FOREIGN KEY (notify_user_uid, notify_event_uid) 
-		REFERENCES notify(user_uid, event_uid) ON DELETE CASCADE
+	notify_uid UUID REFERENCES notify(uid) ON DELETE CASCADE
 );
 
 CREATE TABLE invites (
@@ -51,15 +50,15 @@ CREATE TABLE invites (
 );
 
 CREATE TABLE user_groups (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	user_id UUID REFERENCES users(uid) ON DELETE CASCADE,
 	group_id UUID REFERENCES groups(uid) ON DELETE CASCADE,
 	role VARCHAR(50) NOT NULL DEFAULT 'MEMBER',
-	notify BOOLEAN NOT NULL DEFAULT TRUE,
-	PRIMARY KEY (user_id, group_id)
+	notify BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE group_events (
+	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	group_id UUID REFERENCES groups(uid) ON DELETE CASCADE,
-	event_id UUID REFERENCES events(uid) ON DELETE CASCADE,
-	PRIMARY KEY (group_id, event_id)
+	event_id UUID REFERENCES events(uid) ON DELETE CASCADE
 );

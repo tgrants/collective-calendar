@@ -26,3 +26,10 @@
 
 The `-d` flag detaches the terminal.
 If you want to keep docker open in the terminal, remove this flag.
+
+### Mailpit
+
+Mailpit is used in development to test the notification module.
+It runs in a seperate docker container.
+
+You can access the Mailpit Web UI at http://localhost:8025
