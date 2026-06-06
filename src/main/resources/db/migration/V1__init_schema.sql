@@ -27,7 +27,7 @@ CREATE TABLE notify (
 	user_uid UUID REFERENCES users(uid) ON DELETE CASCADE,
 	event_uid UUID REFERENCES events(uid) ON DELETE CASCADE,
 	notify_email BOOLEAN NOT NULL DEFAULT TRUE,
-	notify_inapp BOOLEAN NOT NULL DEFAULT TRUE,
+	notify_inapp BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE notifications (
@@ -54,11 +54,11 @@ CREATE TABLE user_groups (
 	user_id UUID REFERENCES users(uid) ON DELETE CASCADE,
 	group_id UUID REFERENCES groups(uid) ON DELETE CASCADE,
 	role VARCHAR(50) NOT NULL DEFAULT 'MEMBER',
-	notify BOOLEAN NOT NULL DEFAULT TRUE,
+	notify BOOLEAN NOT NULL DEFAULT TRUE
 );
 
 CREATE TABLE group_events (
 	uid UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 	group_id UUID REFERENCES groups(uid) ON DELETE CASCADE,
-	event_id UUID REFERENCES events(uid) ON DELETE CASCADE,
+	event_id UUID REFERENCES events(uid) ON DELETE CASCADE
 );
