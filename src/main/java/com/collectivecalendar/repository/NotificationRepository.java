@@ -1,13 +1,20 @@
 package com.collectivecalendar.repository;
 
-import com.collectivecalendar.model.Notification;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.collectivecalendar.model.Notification;
+import com.collectivecalendar.model.NotificationStatus;
+import com.collectivecalendar.model.NotificationType;
+
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
-	List<Notification> findByNotifyUserUidAndSeenFalse(UUID notifyUserUid);
-	List<Notification> findByStatus(String status);
+	List<Notification> findByStatusAndTypeAndRetriesLessThan(
+		NotificationStatus status, 
+		NotificationType type, 
+		int maxRetries
+	);
 }

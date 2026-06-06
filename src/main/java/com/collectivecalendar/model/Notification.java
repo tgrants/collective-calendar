@@ -4,18 +4,22 @@ import java.util.UUID;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "notifications")
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,11 +36,13 @@ public class Notification {
 	@Column(name = "notify_event_uid", nullable = false)
 	private UUID notifyEventUid;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "type", nullable = false, length = 50)
-	private String type;
+	private NotificationType type;
 
+	@Enumerated(EnumType.STRING)
 	@Column(name = "status", nullable = false, length = 50)
-	private String status;
+	private NotificationStatus status;
 
 	@Column(name = "retries", nullable = false)
 	@Builder.Default
