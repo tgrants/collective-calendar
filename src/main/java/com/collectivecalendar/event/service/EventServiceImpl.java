@@ -3,7 +3,8 @@ package com.collectivecalendar.event.service;
 import com.collectivecalendar.model.Event;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
@@ -12,23 +13,27 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class EventServiceImpl implements EventService  {
 
-	private final Event event = null;
+	private final Event event;
 	
 	@Override
 	public ZonedDateTime getNextInstance(ZonedDateTime currentTime) {
 		List<ZonedDateTime> allInstances = getAllInstances();
-		// Iterator<ZonedDateTime> currentInstance = null;
+		Iterator<ZonedDateTime> currentInstance = allInstances.iterator();
 		
-		//
-		
-		return ZonedDateTime.now();
+		while (currentInstance.hasNext()) {
+			ZonedDateTime tempTime = currentInstance.next();
+			if (tempTime.isAfter(currentTime)) {
+					return tempTime;
+				}
+			}
+				
+		return null;
 		
 	}
 
-	// TODO do this
 	@Override
 	public List<ZonedDateTime> getAllInstances() {
-		List<ZonedDateTime> timeList = new LinkedList<>();
+		List<ZonedDateTime> timeList = new ArrayList<>();
 		ZonedDateTime startTime = event.getStartTime();
 		ZonedDateTime endTime = event.getEndTime();
 		String frequencyString = event.getFrequency();
