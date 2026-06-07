@@ -8,11 +8,11 @@ public interface EventService {
 	 * Gets the time of next instance of an event at the given point in time.
 	 * * @param current_time 	Current date and time.
 	 */
-	ZonedDateTime getNextInstance(ZonedDateTime current_time);
+	ZonedDateTime getNextInstance(ZonedDateTime currentTime);
 	
 	/**
-	 * Gets the times of all instances of an event after the given point in time.
+	 * Gets the times of all instances of an event.
 	 * * @param current_time 	Current date and time.
 	 */
-	List<ZonedDateTime> getAllInstances(ZonedDateTime current_time);
+	List<ZonedDateTime> getAllInstances();
 }
