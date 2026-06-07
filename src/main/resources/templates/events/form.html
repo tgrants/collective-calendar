@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="lv">
+<head th:replace="fragments/layout :: head('Notikums')"></head>
+<body>
+
+<div th:replace="fragments/layout :: body(${event.uid != null ? 'Rediģēt notikumu' : 'Jauns notikums'}, ~{::main-content})">
+    <th:block th:fragment="main-content">
+
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+
+                <div class="mb-4">
+                    <a th:href="@{/groups/{id}(id=${groupUid})}" class="btn-cc-ghost" style="font-size:13px">
+                        <i class="bi bi-arrow-left"></i> Atpakaļ uz grupu
+                    </a>
+                </div>
+
+                <div class="cc-card">
+                    <h2 style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:24px"
+                        th:text="${event.uid != null ? 'Rediģēt notikumu' : 'Pievienot notikumu'}">
+                        Jauns notikums
+                    </h2>
+
+                    <form th:action="${event.uid != null
+                              ? '/groups/' + groupUid + '/events/' + event.uid + '/edit'
+                              : '/groups/' + groupUid + '/events/create'}"
+                          method="post" th:object="${event}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                        <div class="cc-form-group">
+                            <label class="cc-label" for="name">Notikuma nosaukums</label>
+                            <input id="name" type="text" class="cc-input"
+                                   th:field="*{name}"
+                                   th:classappend="${#fields.hasErrors('name')} ? 'is-invalid'"
+                                   placeholder="Piemēram: Komandas sapulce, Dzimšanas diena..."
+                                   maxlength="150" required>
+                            <div th:if="${#fields.hasErrors('name')}" class="cc-error" th:errors="*{name}"></div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="cc-form-group">
+                                    <label class="cc-label" for="startTime">Sākuma laiks</label>
+                                    <input id="startTime" type="datetime-local" class="cc-input"
+                                           th:field="*{startTime}"
+                                           th:classappend="${#fields.hasErrors('startTime')} ? 'is-invalid'"
+                                           required>
+                                    <div th:if="${#fields.hasErrors('startTime')}" class="cc-error" th:errors="*{startTime}"></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="cc-form-group">
+                                    <label class="cc-label" for="endTime">Beigu laiks</label>
+                                    <input id="endTime" type="datetime-local" class="cc-input"
+                                           th:field="*{endTime}"
+                                           th:classappend="${#fields.hasErrors('endTime')} ? 'is-invalid'"
+                                           required>
+                                    <div th:if="${#fields.hasErrors('endTime')}" class="cc-error" th:errors="*{endTime}"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cc-form-group">
+                            <label class="cc-label" for="frequency">Atkārtošanās</label>
+                            <select id="frequency" class="cc-input" th:field="*{frequency}"
+                                    onchange="toggleUntilField(this.value)">
+                                <option value="">Vienreizējs notikums</option>
+                                <option value="DAILY">Katru dienu</option>
+                                <option value="WEEKLY">Katru nedēļu</option>
+                                <option value="MONTHLY">Katru mēnesi</option>
+                            </select>
+                        </div>
+
+                        <div class="cc-form-group" id="untilGroup"
+                             th:style="${event.frequency == null} ? 'display:none' : ''">
+                            <label class="cc-label" for="until">Atkārtošanās beidzas</label>
+                            <input id="until" type="datetime-local" class="cc-input"
+                                   th:field="*{until}">
+                            <div style="font-size:12px;color:var(--cc-text-muted);margin-top:4px">
+                                Atstājiet tukšu, ja notikums atkārtojas bezgalīgi
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn-cc-primary">
+                                <i class="bi bi-check-lg"></i>
+                                <span th:text="${event.uid != null ? 'Saglabāt izmaiņas' : 'Pievienot notikumu'}">Saglabāt</span>
+                            </button>
+                            <a th:href="@{/groups/{id}(id=${groupUid})}" class="btn-cc-ghost">Atcelt</a>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+
+        <script>
+            function toggleUntilField(value) {
+                document.getElementById('untilGroup').style.display = value ? '' : 'none';
+            }
+        </script>
+
+    </th:block>
+</div>
+
+</body>
+</html>
