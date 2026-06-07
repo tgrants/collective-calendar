@@ -40,19 +40,18 @@ public class CalendarController {
 
     @GetMapping("/calendar")
     public String weekCalendar(
-            @RequestParam(name = "weekOffset", required = false, defaultValue = "0") int weekOffset,
-            @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
-            Model model
+        @RequestParam(name = "weekOffset", required = false, defaultValue = "0") int weekOffset,
+        @AuthenticationPrincipal org.springframework.security.core.userdetails.User principal,
+        Model model
     ) {
         LocalDate today = LocalDate.now();
         LocalDate weekStart = today
                 .plusWeeks(weekOffset)
                 .with(DayOfWeek.MONDAY);
 
-        LocalDate weekEnd = weekStart.plusDays(6);
-
+                
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.forLanguageTag("lv"));
-
+        LocalDate weekEnd = weekStart.plusDays(6);
         String weekLabel = weekStart.format(fmt) + " – " + weekEnd.format(fmt);
 
         List<Map<String, Object>> weekDays = new ArrayList<>();
@@ -75,19 +74,15 @@ public class CalendarController {
         }
 
         User user = userRepository.findByUsername(principal.getUsername()).orElseThrow();
-
         List<UserGroup> userGroups = userGroupsRepository.findByUserId(user.getUid());
 
         Set<UUID> groupIds = userGroups.stream()
                 .map(UserGroup::getGroupId)
                 .collect(Collectors.toSet());
-
         List<GroupEvent> groupEvents = groupEventsRepository.findByGroupIdIn(groupIds);
-
         Set<UUID> eventIds = groupEvents.stream()
                 .map(GroupEvent::getEventId)
                 .collect(Collectors.toSet());
-
         List<Event> events = eventRepository.findAllById(eventIds);
 
         List<Map<String, Object>> calendarEvents = new ArrayList<>();
@@ -97,7 +92,6 @@ public class CalendarController {
             LocalDateTime end = e.getEndTime().toLocalDateTime();
 
             LocalDate eventDate = start.toLocalDate();
-
             int dayIndex = (int) Duration.between(weekStart.atStartOfDay(), eventDate.atStartOfDay()).toDays();
 
             if (dayIndex < 0 || dayIndex > 6) continue;
