@@ -1,5 +1,6 @@
 package com.collectivecalendar.repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +13,7 @@ import com.collectivecalendar.model.GroupEvent;
 public interface GroupEventRepository extends JpaRepository<GroupEvent, UUID> {
 	List<GroupEvent> findByGroupId(UUID groupId);
 	List<GroupEvent> findByEventId(UUID eventId);
+	List<GroupEvent> findByGroupIdIn(Collection<UUID> groupIds);
 	boolean existsByGroupIdAndEventId(UUID groupId, UUID eventId);
 	void deleteByGroupIdAndEventId(UUID groupId, UUID eventId);
 }
