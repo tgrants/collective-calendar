@@ -110,6 +110,7 @@ public class GroupUserServiceImp implements GroupUserService {
         inviteRepository.save(invite);
     }
 
+
     @Override
     public List<Group> getGroups(String user_id) {
         UUID userId = UUID.fromString(user_id);

@@ -1,11 +1,13 @@
 package com.collectivecalendar.groupUser;
 
 import com.collectivecalendar.model.Group;
+import com.collectivecalendar.model.UserGroup;
 import com.collectivecalendar.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import com.collectivecalendar.groupUser.Service.GroupUserService;
 
@@ -38,21 +40,17 @@ public class GroupUserController {
      * GET /api/group-users/groups
      */
     @GetMapping("/groups")
-    public ResponseEntity<List<Group>> getUserGroups(@AuthenticationPrincipal UserDetails principal) {
-        try {
-            String userId = getCurrentUserId(principal);
-            List<Group> groups = groupUserService.getGroups(userId);
-            return ResponseEntity.ok(groups);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+    public String getUserGroups(String user_id, Model model)
+    {
+        List<Group> groups = groupUserService.getGroups(user_id);
+
+        model.addAttribute("userGroups", groups);
+        model.addAttribute("userId", user_id);
+
+        return "groups/list";
+
     }
 
-    /**
-     * Add user to a group (admin action)
-     * POST /api/group-users/add
-     * Body: { "userId": "...", "groupId": "..." }
-     */
     @PostMapping("/add")
     public ResponseEntity<String> addUser(@RequestBody Map<String, String> request) {
         try {
@@ -96,6 +94,7 @@ public class GroupUserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     /**
      * User joins a group

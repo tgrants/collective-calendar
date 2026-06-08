@@ -14,4 +14,5 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, UUID> {
 	List<UserGroup> findByUserId(UUID userId);
 	boolean existsByUserIdAndGroupId(UUID userId, UUID groupId);
 	void deleteByUserIdAndGroupId(UUID userId, UUID groupId);
+	void deleteByGroupId(UUID groupId);
 }
