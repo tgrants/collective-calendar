@@ -21,12 +21,6 @@ import java.util.UUID;
             this.service = service;
             this.groupRepository = groupRepository;
         }
-        // Iegūst sarakstu ar grupām, kam lietotājs pieder
-        @GetMapping("/groups")
-        public String groupList (Model model) {
-            model.addAttribute("groups", groupRepository.findAll());
-            return "groups/list";
-        }
 
         /*
         /CREATE

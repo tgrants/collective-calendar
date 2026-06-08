@@ -28,11 +28,9 @@ public class GroupServiceImp implements GroupService {
 
     @Override
     public void createGroup(String group_name) {
-        Group group = Group.builder()
-                .name(group_name)
-                .build();
-
-        groupRepository.save(group);
+        Group group = new Group();
+        group.setName(group_name);
+                groupRepository.save(group);
     }
 
     @Override
