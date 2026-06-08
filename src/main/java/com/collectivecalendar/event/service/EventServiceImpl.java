@@ -24,20 +24,6 @@ public class EventServiceImpl implements EventService  {
 	
 	@Override
 	public void saveEvent(Event event) {
-		switch(event.getFrequency()) {
-		case "DAILY":
-			event.setFrequency("d1");
-			break;
-		case "WEEKLY":
-			event.setFrequency("w1");
-			break;
-		case "MONTHLY":
-			event.setFrequency("m1");
-			break;
-		default:
-			event.setFrequency(" ");
-			break;
-		}
 		eventRepository.save(event);
 	}
 	
@@ -48,21 +34,8 @@ public class EventServiceImpl implements EventService  {
 		existingEvent.setName(event.getName());
 		existingEvent.setStartTime(event.getStartTime());
 		existingEvent.setEndTime(event.getEndTime());
-		switch(event.getFrequency()) {
-		case "DAILY":
-			existingEvent.setFrequency("d1");
-			break;
-		case "WEEKLY":
-			existingEvent.setFrequency("w1");
-			break;
-		case "MONTHLY":
-			existingEvent.setFrequency("m1");
-			break;
-		default:
-			existingEvent.setFrequency(" ");
-			break;
-		}
 		existingEvent.setFrequency(event.getFrequency());
+		existingEvent.setUntil(event.getUntil());
 
 		eventRepository.save(existingEvent);
 	}
@@ -80,12 +53,11 @@ public class EventServiceImpl implements EventService  {
 		while (currentInstance.hasNext()) {
 			ZonedDateTime tempTime = currentInstance.next();
 			if (tempTime.isAfter(currentTime)) {
-					return tempTime;
-				}
+				return tempTime;
 			}
+		}
 				
 		return null;
-		
 	}
 
 	@Override
@@ -94,21 +66,20 @@ public class EventServiceImpl implements EventService  {
 		ZonedDateTime startTime = event.getStartTime();
 		ZonedDateTime untilTime = event.getUntil();
 		String frequencyString = event.getFrequency();
-		int frequencyInt = Integer.parseInt(frequencyString.substring(1));
 		
-		switch(frequencyString.charAt(0)) {
-		case 'd':
-			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusDays(frequencyInt)) {
+		switch(frequencyString) {
+		case "DAILY":
+			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusDays(1)) {
 				timeList.add(tempTime);
 			}
 			break;
-		case 'w':
-			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusWeeks(frequencyInt)) {
+		case "WEEKLY":
+			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusWeeks(1)) {
 				timeList.add(tempTime);
 			}
 			break;
-		case 'm':
-			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusMonths(frequencyInt)) {
+		case "MONTHLY":
+			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusMonths(1)) {
 				timeList.add(tempTime);
 			}
 			break;
