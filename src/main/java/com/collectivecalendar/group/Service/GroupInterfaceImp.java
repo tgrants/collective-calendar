@@ -1,4 +1,4 @@
-package com.collectivecalendar.group;
+package com.collectivecalendar.group.Service;
 
 public class GroupInterfaceImp implements GroupInterface {
 
