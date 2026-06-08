@@ -8,6 +8,8 @@ import com.collectivecalendar.repository.GroupEventRepository;
 import com.collectivecalendar.repository.UserRepository;
 import com.collectivecalendar.model.UserGroup;
 import com.collectivecalendar.repository.UserGroupRepository;
+import com.collectivecalendar.event.service.EventService;
+import com.collectivecalendar.event.service.EventServiceImpl;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -87,31 +90,42 @@ public class CalendarController {
 
         List<Map<String, Object>> calendarEvents = new ArrayList<>();
 
+        EventService eventService = new EventServiceImpl();
         for (Event e : events) {
-            LocalDateTime start = e.getStartTime().toLocalDateTime();
-            LocalDateTime end = e.getEndTime().toLocalDateTime();
+        	List<ZonedDateTime> eventInstances = eventService.getAllInstances(e);
+        	LocalDateTime startTime = e.getStartTime().toLocalDateTime();
+        	LocalDateTime endTime = e.getEndTime().toLocalDateTime();
+        	
+        	long daysDuration = ChronoUnit.MONTHS.between(startTime, endTime);
+        	long hoursDuration = ChronoUnit.MONTHS.between(startTime, endTime);
+        	long minutesDuration = ChronoUnit.MONTHS.between(startTime, endTime);
+        	
+        	for (ZonedDateTime instance : eventInstances) {
+        		LocalDateTime start = instance.toLocalDateTime();
+                LocalDateTime end = instance.plusDays(daysDuration).plusHours(hoursDuration).plusMinutes(minutesDuration).toLocalDateTime();
 
-            LocalDate eventDate = start.toLocalDate();
-            int dayIndex = (int) Duration.between(weekStart.atStartOfDay(), eventDate.atStartOfDay()).toDays();
+                LocalDate eventDate = start.toLocalDate();
+                int dayIndex = (int) Duration.between(weekStart.atStartOfDay(), eventDate.atStartOfDay()).toDays();
 
-            if (dayIndex < 0 || dayIndex > 6) continue;
+                if (dayIndex < 0 || dayIndex > 6) continue;
 
-            int startMinutes = start.getHour() * 60 + start.getMinute();
-            int endMinutes = end.getHour() * 60 + end.getMinute();
+                int startMinutes = start.getHour() * 60 + start.getMinute();
+                int endMinutes = end.getHour() * 60 + end.getMinute();
 
-            int topPx = (startMinutes - 7 * 60) * 56 / 60;
-            int heightPx = Math.max(20, (endMinutes - startMinutes) * 56 / 60);
+                int topPx = (startMinutes - 7 * 60) * 56 / 60;
+                int heightPx = Math.max(20, (endMinutes - startMinutes) * 56 / 60);
 
-            Map<String, Object> ev = new HashMap<>();
-            ev.put("id", e.getUid());
-            ev.put("name", e.getName());
-            ev.put("dayIndex", dayIndex);
-            ev.put("topPx", topPx);
-            ev.put("heightPx", heightPx);
-            ev.put("colorIndex", Math.abs(e.getUid().hashCode()) % 6);
-            ev.put("groupName", "Grupa");
+                Map<String, Object> ev = new HashMap<>();
+                ev.put("id", e.getUid());
+                ev.put("name", e.getName());
+                ev.put("dayIndex", dayIndex);
+                ev.put("topPx", topPx);
+                ev.put("heightPx", heightPx);
+                ev.put("colorIndex", Math.abs(e.getUid().hashCode()) % 6);
+                ev.put("groupName", "Grupa");
 
-            calendarEvents.add(ev);
+                calendarEvents.add(ev);
+        	}
         }
 
         List<String> groupColors = List.of(

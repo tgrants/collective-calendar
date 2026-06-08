@@ -13,6 +13,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "events")
@@ -28,17 +30,17 @@ public class Event {
 	private UUID uid;
 
 	@Column(name = "name", nullable = false, length = 150)
-	private String name;
+	@Getter @Setter private String name;
 
 	@Column(name = "start_time", nullable = false)
-	private ZonedDateTime startTime;
+	@Getter @Setter private ZonedDateTime startTime;
 
 	@Column(name = "end_time", nullable = false)
-	private ZonedDateTime endTime;
+	@Getter @Setter private ZonedDateTime endTime;
 
 	@Column(name = "frequency", length = 50)
-	private String frequency;
+	@Getter @Setter private String frequency;
 
 	@Column(name = "until")
-	private ZonedDateTime until;
+	@Getter @Setter private ZonedDateTime until;
 }
