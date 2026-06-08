@@ -21,5 +21,5 @@ public interface EventService {
 	 * Gets the times of all instances of an event.
 	 * * @param current_time 	Current date and time.
 	 */
-	List<LocalDateTime> getAllInstances(Event event);
+	List<LocalDateTime> getInstances(Event event, int count);
 }
