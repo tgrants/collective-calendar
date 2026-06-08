@@ -18,8 +18,9 @@ public interface EventService {
 	LocalDateTime getNextInstance(Event event, LocalDateTime currentTime);
 	
 	/**
-	 * Gets the times of all instances of an event.
+	 * Gets the times of a set number of instances for an event.
 	 * * @param current_time 	Current date and time.
+	 * * @param count			Count of instances.
 	 */
 	List<LocalDateTime> getInstances(Event event, int count);
 }

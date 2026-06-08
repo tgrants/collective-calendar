@@ -2,10 +2,10 @@ package com.collectivecalendar;
 
 import com.collectivecalendar.model.Event;
 import com.collectivecalendar.event.service.EventService;
+import com.collectivecalendar.groupEvent.service.GroupEventService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class EventController {
 	private final EventService eventService;
+	private final GroupEventService groupEventService;
 	
 	@GetMapping("/groups/{group_id}/events/create")
     public String createEvent(@PathVariable UUID group_id, Model model) {
@@ -35,7 +36,7 @@ public class EventController {
 	@PostMapping(value = "/groups/{group_id}/events/create", consumes = "application/x-www-form-urlencoded;charset=UTF-8")
     public String saveEvent(@ModelAttribute Event event, @PathVariable UUID group_id, Model model) {
 		eventService.saveEvent(event);
-		System.out.println(event.toString());
+		groupEventService.createGroupEvent(group_id, event.getUid());
 		
         return "redirect:/calendar";
     }
@@ -57,10 +58,11 @@ public class EventController {
 		return "redirect:/calendar";
 	}
 	
-	@DeleteMapping("/groups/{group_id}/events/{event_id}/delete")
-	public String editEvent(@PathVariable UUID group_id, @PathVariable UUID event_id) {
+	@PostMapping("/groups/{group_id}/events/{event_id}/delete")
+	public String deleteEvent(@PathVariable UUID group_id, @PathVariable UUID event_id) {
 		eventService.deleteEvent(event_id);
+		groupEventService.deleteGroupEvent(group_id, event_id);
 		
-		return "events/form";
+		return "redirect:/calendar";
 	}
 }
