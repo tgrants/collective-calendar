@@ -1,11 +1,13 @@
 package com.collectivecalendar.repository;
 
-import java.util.UUID;
+import java.util.List;
 import java.util.Optional;
-import com.collectivecalendar.model.Event;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import java.util.List;
+
+import com.collectivecalendar.model.Event;
 
 @Repository
 public interface EventRepository extends JpaRepository<Event, UUID> {

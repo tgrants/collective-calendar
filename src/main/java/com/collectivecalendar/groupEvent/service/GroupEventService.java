@@ -1,6 +1,5 @@
 package com.collectivecalendar.groupEvent.service;
 
-import com.collectivecalendar.model.GroupEvent;
 import java.util.UUID;
 
 public interface GroupEventService {

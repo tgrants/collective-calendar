@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Error</title>
+	<title>Error</title>
 </head>
 <body>
-    <h1>Something went wrong</h1>
+	<h1>Something went wrong</h1>
 
-    <p>Status: <span th:text="${status}"></span></p>
-    <p>Error: <span th:text="${error}"></span></p>
-    <p th:text="${message}"></p>
+	<p>Status: <span th:text="${status}"></span></p>
+	<p>Error: <span th:text="${error}"></span></p>
+	<p th:text="${message}"></p>
 
-    <a th:href="@{/}">Go Home</a>
+	<a th:href="@{/}">Go Home</a>
 </body>
 </html>

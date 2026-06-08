@@ -1,102 +1,102 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="lv">
+	  xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="lv">
 <head th:replace="~{fragments/layout :: head('Kalendārs')}"></head>
 <body>
 
 <div th:replace="~{fragments/layout :: body('Kalendārs', ~{::main-content})}">
-    <th:block th:fragment="main-content">
+	<th:block th:fragment="main-content">
 
-        <div class="calendar-nav">
-            <a class="btn-cc-ghost" th:href="@{/calendar(weekOffset=${weekOffset - 1})}">
-                <i class="bi bi-chevron-left"></i> Iepriekšējā
-            </a>
-            <span class="week-label" th:text="${weekLabel}">2024. gada 1.–7. janvāris</span>
-            <a class="btn-cc-ghost" th:href="@{/calendar(weekOffset=${weekOffset + 1})}">
-                Nākamā <i class="bi bi-chevron-right"></i>
-            </a>
-            <button class="btn-cc-ghost ms-auto" onclick="window.location.href='/calendar'">
-                <i class="bi bi-calendar-event me-1"></i> Šodien
-            </button>
-        </div>
+		<div class="calendar-nav">
+			<a class="btn-cc-ghost" th:href="@{/calendar(weekOffset=${weekOffset - 1})}">
+				<i class="bi bi-chevron-left"></i> Iepriekšējā
+			</a>
+			<span class="week-label" th:text="${weekLabel}">2024. gada 1.–7. janvāris</span>
+			<a class="btn-cc-ghost" th:href="@{/calendar(weekOffset=${weekOffset + 1})}">
+				Nākamā <i class="bi bi-chevron-right"></i>
+			</a>
+			<button class="btn-cc-ghost ms-auto" onclick="window.location.href='/calendar'">
+				<i class="bi bi-calendar-event me-1"></i> Šodien
+			</button>
+		</div>
 
-        <div class="week-grid">
-            <div class="week-header-cell" style="background: var(--cc-surface-2)"></div>
-            <div th:each="day, stat : ${weekDays}"
-                 class="week-header-cell"
-                 th:classappend="${day.isToday} ? 'today'">
-                <div class="day-name" th:text="${day.dayName}">P</div>
-                <div class="day-num" th:text="${day.dayNumber}">1</div>
-            </div>
+		<div class="week-grid">
+			<div class="week-header-cell" style="background: var(--cc-surface-2)"></div>
+			<div th:each="day, stat : ${weekDays}"
+				 class="week-header-cell"
+				 th:classappend="${day.isToday} ? 'today'">
+				<div class="day-name" th:text="${day.dayName}">P</div>
+				<div class="day-num" th:text="${day.dayNumber}">1</div>
+			</div>
 
-            <th:block th:each="hour : ${hours}">
-                <div class="time-slot" style="background: var(--cc-surface-2); border-right: 1px solid var(--cc-border)">
-                    <span th:text="${hour} + ':00'">9:00</span>
-                </div>
-                <div th:each="day : ${weekDays}" class="day-col">
-                    <div class="day-slot"></div>
-                </div>
-            </th:block>
-        </div>
+			<th:block th:each="hour : ${hours}">
+				<div class="time-slot" style="background: var(--cc-surface-2); border-right: 1px solid var(--cc-border)">
+					<span th:text="${hour} + ':00'">9:00</span>
+				</div>
+				<div th:each="day : ${weekDays}" class="day-col">
+					<div class="day-slot"></div>
+				</div>
+			</th:block>
+		</div>
 
-        <script th:inline="javascript">
-            const calendarEvents = /*[[${calendarEvents}]]*/ [];
-            const HOUR_HEIGHT = 56;
+		<script th:inline="javascript">
+			const calendarEvents = /*[[${calendarEvents}]]*/ [];
+			const HOUR_HEIGHT = 56;
 
-            document.addEventListener('DOMContentLoaded', () => {
-                const grid = document.querySelector('.week-grid');
-                if (!grid) return;
+			document.addEventListener('DOMContentLoaded', () => {
+				const grid = document.querySelector('.week-grid');
+				if (!grid) return;
 
-                const dayColsArr = Array.from(grid.querySelectorAll('.day-col'));
+				const dayColsArr = Array.from(grid.querySelectorAll('.day-col'));
 
-                calendarEvents.forEach(ev => {
-                    renderEventOverlay(ev);
-                });
+				calendarEvents.forEach(ev => {
+					renderEventOverlay(ev);
+				});
 
-                function renderEventOverlay(ev) {
-                    const allDayCols = grid.querySelectorAll('.day-col');
+				function renderEventOverlay(ev) {
+					const allDayCols = grid.querySelectorAll('.day-col');
 
-                    const firstColForDay = allDayCols[ev.dayIndex];
-                    if (!firstColForDay) return;
+					const firstColForDay = allDayCols[ev.dayIndex];
+					if (!firstColForDay) return;
 
-                    const rect = firstColForDay.getBoundingClientRect();
-                    const gridRect = grid.getBoundingClientRect();
+					const rect = firstColForDay.getBoundingClientRect();
+					const gridRect = grid.getBoundingClientRect();
 
-                    const el = document.createElement('div');
-                    el.className = `cal-event event-color-${ev.colorIndex}`;
-                    el.title = ev.name + ' – ' + ev.groupName;
-                    el.innerHTML = `<div class="cal-event-name">${ev.name}</div><div style="font-size:10px;opacity:.7">${ev.groupName}</div>`;
+					const el = document.createElement('div');
+					el.className = `cal-event event-color-${ev.colorIndex}`;
+					el.title = ev.name + ' – ' + ev.groupName;
+					el.innerHTML = `<div class="cal-event-name">${ev.name}</div><div style="font-size:10px;opacity:.7">${ev.groupName}</div>`;
 
-                    el.style.position = 'absolute';
-                    el.style.top    = (rect.top  - gridRect.top  + ev.topPx) + 'px';
-                    el.style.left   = (rect.left - gridRect.left + 3)        + 'px';
-                    el.style.width  = (rect.width - 6) + 'px';
-                    el.style.height = ev.heightPx + 'px';
+					el.style.position = 'absolute';
+					el.style.top    = (rect.top  - gridRect.top  + ev.topPx) + 'px';
+					el.style.left   = (rect.left - gridRect.left + 3)        + 'px';
+					el.style.width  = (rect.width - 6) + 'px';
+					el.style.height = ev.heightPx + 'px';
 
-                    grid.style.position = 'relative';
-                    grid.appendChild(el);
-                }
-            });
-        </script>
+					grid.style.position = 'relative';
+					grid.appendChild(el);
+				}
+			});
+		</script>
 
-        <div class="cc-card mt-4">
-            <div class="cc-card-header">
-                <h3 class="cc-card-title">Grupas</h3>
-            </div>
-            <div class="d-flex flex-wrap gap-3">
-                <div th:each="group, stat : ${userGroups}"
-                     class="d-flex align-items-center gap-2">
-                    <div class="rounded-2" style="width:12px;height:12px"
-                         th:style="'background:' + ${groupColors[stat.index % groupColors.size()]}"></div>
-                    <span style="font-size:13px" th:text="${group.name}">Grupas nosaukums</span>
-                </div>
-                <div th:if="${#lists.isEmpty(userGroups)}" class="text-muted" style="font-size:13px">
-                    Nav grupu — <a th:href="@{/groups/create}">izveidojiet pirmo grupu</a>.
-                </div>
-            </div>
-        </div>
+		<div class="cc-card mt-4">
+			<div class="cc-card-header">
+				<h3 class="cc-card-title">Grupas</h3>
+			</div>
+			<div class="d-flex flex-wrap gap-3">
+				<div th:each="group, stat : ${userGroups}"
+					 class="d-flex align-items-center gap-2">
+					<div class="rounded-2" style="width:12px;height:12px"
+						 th:style="'background:' + ${groupColors[stat.index % groupColors.size()]}"></div>
+					<span style="font-size:13px" th:text="${group.name}">Grupas nosaukums</span>
+				</div>
+				<div th:if="${#lists.isEmpty(userGroups)}" class="text-muted" style="font-size:13px">
+					Nav grupu — <a th:href="@{/groups/create}">izveidojiet pirmo grupu</a>.
+				</div>
+			</div>
+		</div>
 
-    </th:block>
+	</th:block>
 </div>
 
 </body>

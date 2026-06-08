@@ -4,69 +4,69 @@
 <body>
 
 <div th:replace="fragments/layout :: body('Manas grupas', ~{::main-content})">
-    <th:block th:fragment="main-content">
-        <div class="page-header">
-            <h2>Manas grupas</h2>
-            <a th:href="@{/groups/create}" class="btn-cc-primary">
-                <i class="bi bi-plus-lg"></i> Jauna grupa
-            </a>
-        </div>
+	<th:block th:fragment="main-content">
+		<div class="page-header">
+			<h2>Manas grupas</h2>
+			<a th:href="@{/groups/create}" class="btn-cc-primary">
+				<i class="bi bi-plus-lg"></i> Jauna grupa
+			</a>
+		</div>
 
-        <div th:if="${not #lists.isEmpty(groups)}" class="group-grid">
-            <a th:each="membership : ${groups}"
-               th:href="@{/groups/{id}(id=${membership.group.uid})}"
-               class="group-card">
+		<div th:if="${not #lists.isEmpty(groups)}" class="group-grid">
+			<a th:each="membership : ${groups}"
+			   th:href="@{/groups/{id}(id=${membership.group.uid})}"
+			   class="group-card">
 
-                <div class="group-card-header">
-                    <div class="group-icon"
-                         th:style="'background:' + ${membership.color} + '22; color:' + ${membership.color}">
-                        <i class="bi bi-people-fill"></i>
-                    </div>
-                    <div style="flex:1">
-                        <h3 class="group-card-name" th:text="${membership.group.name}">Grupas nosaukums</h3>
-                        <div class="mt-1">
-                            <span class="role-badge"
-                                  th:classappend="${membership.role == 'EDITOR'} ? 'editor' : 'viewer'"
-                                  th:text="${membership.role == 'EDITOR'} ? 'Redaktors' : 'Skatītājs'">Loma</span>
-                        </div>
-                    </div>
-                </div>
+				<div class="group-card-header">
+					<div class="group-icon"
+						 th:style="'background:' + ${membership.color} + '22; color:' + ${membership.color}">
+						<i class="bi bi-people-fill"></i>
+					</div>
+					<div style="flex:1">
+						<h3 class="group-card-name" th:text="${membership.group.name}">Grupas nosaukums</h3>
+						<div class="mt-1">
+							<span class="role-badge"
+								  th:classappend="${membership.role == 'EDITOR'} ? 'editor' : 'viewer'"
+								  th:text="${membership.role == 'EDITOR'} ? 'Redaktors' : 'Skatītājs'">Loma</span>
+						</div>
+					</div>
+				</div>
 
-                <div class="group-card-meta">
-                    <span><i class="bi bi-calendar2-event"></i> <span th:text="${membership.eventCount}">0</span> notikumi</span>
-                    <span><i class="bi bi-people"></i> <span th:text="${membership.memberCount}">1</span> dalībnieki</span>
-                </div>
-            </a>
-        </div>
+				<div class="group-card-meta">
+					<span><i class="bi bi-calendar2-event"></i> <span th:text="${membership.eventCount}">0</span> notikumi</span>
+					<span><i class="bi bi-people"></i> <span th:text="${membership.memberCount}">1</span> dalībnieki</span>
+				</div>
+			</a>
+		</div>
 
-        <div th:if="${#lists.isEmpty(groups)}" class="cc-card">
-            <div class="empty-state">
-                <i class="bi bi-people d-block"></i>
-                <h3>Nav grupu</h3>
-                <p>Izveidojiet savu pirmo grupu vai gaidiet ielūgumu no cita lietotāja.</p>
-                <a th:href="@{/groups/create}" class="btn-cc-primary mt-2">
-                    <i class="bi bi-plus-lg"></i> Izveidot grupu
-                </a>
-            </div>
-        </div>
+		<div th:if="${#lists.isEmpty(groups)}" class="cc-card">
+			<div class="empty-state">
+				<i class="bi bi-people d-block"></i>
+				<h3>Nav grupu</h3>
+				<p>Izveidojiet savu pirmo grupu vai gaidiet ielūgumu no cita lietotāja.</p>
+				<a th:href="@{/groups/create}" class="btn-cc-primary mt-2">
+					<i class="bi bi-plus-lg"></i> Izveidot grupu
+				</a>
+			</div>
+		</div>
 
-        <div th:if="${pendingInviteCount != null and pendingInviteCount > 0}" class="cc-card mt-4">
-            <div class="d-flex align-items-center gap-3">
-                <div class="group-icon" style="background:#eef1fe;color:#4f6ef7">
-                    <i class="bi bi-envelope-open"></i>
-                </div>
-                <div style="flex:1">
-                    <div style="font-weight:700">Neapstiprināti ielūgumi</div>
-                    <div style="font-size:13px;color:var(--cc-text-muted)">
-                        Jums ir <span th:text="${pendingInviteCount}">1</span> neapstiprināts ielūgums
-                    </div>
-                </div>
-                <a th:href="@{/groups/invites}" class="btn-cc-outline">
-                    Apskatīt <i class="bi bi-arrow-right"></i>
-                </a>
-            </div>
-        </div>
-    </th:block>
+		<div th:if="${pendingInviteCount != null and pendingInviteCount > 0}" class="cc-card mt-4">
+			<div class="d-flex align-items-center gap-3">
+				<div class="group-icon" style="background:#eef1fe;color:#4f6ef7">
+					<i class="bi bi-envelope-open"></i>
+				</div>
+				<div style="flex:1">
+					<div style="font-weight:700">Neapstiprināti ielūgumi</div>
+					<div style="font-size:13px;color:var(--cc-text-muted)">
+						Jums ir <span th:text="${pendingInviteCount}">1</span> neapstiprināts ielūgums
+					</div>
+				</div>
+				<a th:href="@{/groups/invites}" class="btn-cc-outline">
+					Apskatīt <i class="bi bi-arrow-right"></i>
+				</a>
+			</div>
+		</div>
+	</th:block>
 </div>
 
 </body>

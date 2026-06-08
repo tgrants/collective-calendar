@@ -1,9 +1,10 @@
 package com.collectivecalendar.event.service;
 
-import com.collectivecalendar.model.Event;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
+import com.collectivecalendar.model.Event;
 
 public interface EventService {
 	Event findEvent(UUID eventId);
