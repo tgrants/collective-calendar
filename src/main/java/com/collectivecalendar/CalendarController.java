@@ -3,13 +3,14 @@ package com.collectivecalendar;
 import com.collectivecalendar.model.Event;
 import com.collectivecalendar.repository.EventRepository;
 import com.collectivecalendar.model.GroupEvent;
+import com.collectivecalendar.model.Group;
 import com.collectivecalendar.model.User;
 import com.collectivecalendar.repository.GroupEventRepository;
+import com.collectivecalendar.repository.GroupRepository;
 import com.collectivecalendar.repository.UserRepository;
 import com.collectivecalendar.model.UserGroup;
 import com.collectivecalendar.repository.UserGroupRepository;
 import com.collectivecalendar.event.service.EventService;
-import com.collectivecalendar.event.service.EventServiceImpl;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,17 +29,23 @@ public class CalendarController {
     private final GroupEventRepository groupEventsRepository;
     private final UserGroupRepository userGroupsRepository;
     private final UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final EventService eventService;
 
     public CalendarController(
         EventRepository eventRepository,
         GroupEventRepository groupEventsRepository,
         UserGroupRepository userGroupsRepository,
-        UserRepository userRepository
+        UserRepository userRepository,
+        GroupRepository groupRepository,
+        EventService eventService
     ) {
         this.eventRepository = eventRepository;
         this.groupEventsRepository = groupEventsRepository;
         this.userGroupsRepository = userGroupsRepository;
         this.userRepository = userRepository;
+        this.groupRepository = groupRepository;
+        this.eventService = eventService;
     }
 
     @GetMapping("/calendar")
@@ -52,7 +59,6 @@ public class CalendarController {
                 .plusWeeks(weekOffset)
                 .with(DayOfWeek.MONDAY);
 
-                
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("d. MMMM yyyy", Locale.forLanguageTag("lv"));
         LocalDate weekEnd = weekStart.plusDays(6);
         String weekLabel = weekStart.format(fmt) + " – " + weekEnd.format(fmt);
@@ -82,6 +88,10 @@ public class CalendarController {
         Set<UUID> groupIds = userGroups.stream()
                 .map(UserGroup::getGroupId)
                 .collect(Collectors.toSet());
+
+        Map<UUID, String> groupNames = groupRepository.findAllById(groupIds).stream()
+                .collect(Collectors.toMap(Group::getUid, Group::getName));
+
         List<GroupEvent> groupEvents = groupEventsRepository.findByGroupIdIn(groupIds);
         Set<UUID> eventIds = groupEvents.stream()
                 .map(GroupEvent::getEventId)
@@ -90,19 +100,28 @@ public class CalendarController {
 
         List<Map<String, Object>> calendarEvents = new ArrayList<>();
 
-        EventService eventService = new EventServiceImpl();
         for (Event e : events) {
-        	List<ZonedDateTime> eventInstances = eventService.getAllInstances(e);
-        	LocalDateTime startTime = e.getStartTime().toLocalDateTime();
-        	LocalDateTime endTime = e.getEndTime().toLocalDateTime();
-        	
-        	long daysDuration = ChronoUnit.MONTHS.between(startTime, endTime);
-        	long hoursDuration = ChronoUnit.MONTHS.between(startTime, endTime);
-        	long minutesDuration = ChronoUnit.MONTHS.between(startTime, endTime);
-        	
-        	for (ZonedDateTime instance : eventInstances) {
-        		LocalDateTime start = instance.toLocalDateTime();
-                LocalDateTime end = instance.plusDays(daysDuration).plusHours(hoursDuration).plusMinutes(minutesDuration).toLocalDateTime();
+            List<ZonedDateTime> eventInstances = eventService.getAllInstances(e);
+            LocalDateTime startTime = e.getStartTime().toLocalDateTime();
+            LocalDateTime endTime = e.getEndTime().toLocalDateTime();
+
+            long daysDuration    = ChronoUnit.DAYS.between(startTime, endTime);
+            long hoursDuration   = ChronoUnit.HOURS.between(startTime, endTime) % 24;
+            long minutesDuration = ChronoUnit.MINUTES.between(startTime, endTime) % 60;
+
+            String groupName = groupEvents.stream()
+                    .filter(ge -> ge.getEventId().equals(e.getUid()))
+                    .map(ge -> groupNames.getOrDefault(ge.getGroupId(), "Grupa"))
+                    .findFirst()
+                    .orElse("Grupa");
+
+            for (ZonedDateTime instance : eventInstances) {
+                LocalDateTime start = instance.toLocalDateTime();
+                LocalDateTime end = instance
+                        .plusDays(daysDuration)
+                        .plusHours(hoursDuration)
+                        .plusMinutes(minutesDuration)
+                        .toLocalDateTime();
 
                 LocalDate eventDate = start.toLocalDate();
                 int dayIndex = (int) Duration.between(weekStart.atStartOfDay(), eventDate.atStartOfDay()).toDays();
@@ -122,22 +141,32 @@ public class CalendarController {
                 ev.put("topPx", topPx);
                 ev.put("heightPx", heightPx);
                 ev.put("colorIndex", Math.abs(e.getUid().hashCode()) % 6);
-                ev.put("groupName", "Grupa");
+                ev.put("groupName", groupName);
 
                 calendarEvents.add(ev);
-        	}
+            }
         }
 
         List<String> groupColors = List.of(
                 "#4f46e5", "#06b6d4", "#22c55e", "#f59e0b", "#ef4444", "#a855f7"
         );
 
+        List<Map<String, Object>> userGroupsDisplay = userGroups.stream()
+                .map(ug -> {
+                    Map<String, Object> m = new HashMap<>();
+                    m.put("groupId", ug.getGroupId());
+                    m.put("name", groupNames.getOrDefault(ug.getGroupId(), "—"));
+                    m.put("role", ug.getRole());
+                    return m;
+                })
+                .collect(Collectors.toList());
+
         model.addAttribute("weekLabel", weekLabel);
         model.addAttribute("weekDays", weekDays);
         model.addAttribute("hours", hours);
         model.addAttribute("calendarEvents", calendarEvents);
         model.addAttribute("weekOffset", weekOffset);
-        model.addAttribute("userGroups", userGroups);
+        model.addAttribute("userGroups", userGroupsDisplay);
         model.addAttribute("groupColors", groupColors);
 
         return "calendar/week";
@@ -145,13 +174,13 @@ public class CalendarController {
 
     private String getLatvianShortDay(DayOfWeek day) {
         return switch (day) {
-            case MONDAY -> "P";
-            case TUESDAY -> "O";
+            case MONDAY    -> "P";
+            case TUESDAY   -> "O";
             case WEDNESDAY -> "T";
-            case THURSDAY -> "C";
-            case FRIDAY -> "Pk";
-            case SATURDAY -> "S";
-            case SUNDAY -> "Sv";
+            case THURSDAY  -> "C";
+            case FRIDAY    -> "Pk";
+            case SATURDAY  -> "S";
+            case SUNDAY    -> "Sv";
         };
     }
 }

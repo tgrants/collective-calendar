@@ -38,17 +38,17 @@ public class EventServiceImpl implements EventService  {
 		
 		switch(frequencyString.charAt(0)) {
 		case 'd':
-			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(endTime); tempTime.plusDays(frequencyInt)) {
+			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(endTime); tempTime = tempTime.plusDays(frequencyInt)) {
 				timeList.add(tempTime);
 			}
 			break;
 		case 'w':
-			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(endTime); tempTime.plusWeeks(frequencyInt)) {
+			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(endTime); tempTime = tempTime.plusWeeks(frequencyInt)) {
 				timeList.add(tempTime);
 			}
 			break;
 		case 'm':
-			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(endTime); tempTime.plusMonths(frequencyInt)) {
+			for (ZonedDateTime tempTime = startTime; !tempTime.isAfter(endTime); tempTime = tempTime.plusMonths(frequencyInt)) {
 				timeList.add(tempTime);
 			}
 			break;

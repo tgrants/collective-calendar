@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:sec="http://www.thymeleaf.org/extras/spring-security" lang="lv">
-<head th:replace="fragments/layout :: head('Kalendārs')"></head>
+<head th:replace="~{fragments/layout :: head('Kalendārs')}"></head>
 <body>
 
-<div th:replace="fragments/layout :: body('Kalendārs', ~{::main-content})">
+<div th:replace="~{fragments/layout :: body('Kalendārs', ~{::main-content})}">
     <th:block th:fragment="main-content">
 
         <div class="calendar-nav">
