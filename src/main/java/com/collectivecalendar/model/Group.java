@@ -12,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "`groups`")
@@ -27,5 +29,6 @@ public class Group {
 	private UUID uid;
 
 	@Column(name = "name", nullable = false, length = 100)
-	private String name;
+	@Getter @Setter private String name;
+
 }

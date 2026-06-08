@@ -6,12 +6,14 @@ import org.flywaydb.core.Flyway;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import jakarta.persistence.EntityManagerFactory;
 
 @Configuration
+@ConditionalOnProperty(prefix = "spring.flyway", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class FlywayMigrationConfig implements BeanFactoryPostProcessor {
 
 	@Bean(initMethod = "migrate")
