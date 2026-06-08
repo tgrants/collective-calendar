@@ -22,7 +22,7 @@ public class GroupUserController {
      * Get all groups for a user
      * GET /api/group-users/{userId}/groups
      */
-    @GetMapping("/{userId}/groups")
+    @GetMapping("/groups")
     public ResponseEntity<List<Group>> getUserGroups(@PathVariable String userId) {
         try {
             List<Group> groups = groupUserService.getGroups(userId);
