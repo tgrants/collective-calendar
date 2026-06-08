@@ -96,7 +96,8 @@ public class CalendarController {
         Set<UUID> eventIds = groupEvents.stream()
                 .map(GroupEvent::getEventId)
                 .collect(Collectors.toSet());
-        List<Event> events = eventRepository.findAllById(eventIds);
+        // List<Event> events = eventRepository.findAllById(eventIds);
+        List<Event> events = eventRepository.findAll();
 
         List<Map<String, Object>> calendarEvents = new ArrayList<>();
 

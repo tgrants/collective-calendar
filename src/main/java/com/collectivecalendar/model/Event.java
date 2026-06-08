@@ -27,7 +27,7 @@ public class Event {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "uid", updatable = false, nullable = false)
-	private UUID uid;
+	@Getter private UUID uid;
 
 	@Column(name = "name", nullable = false, length = 150)
 	@Getter @Setter private String name;
