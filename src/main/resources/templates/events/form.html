@@ -8,13 +8,13 @@
 
         <div class="row justify-content-center">
             <div class="col-lg-6">
-
+				
                 <div class="mb-4">
                     <a th:href="@{/groups/{id}(id=${groupUid})}" class="btn-cc-ghost" style="font-size:13px">
                         <i class="bi bi-arrow-left"></i> Atpakaļ uz grupu
                     </a>
                 </div>
-
+				
                 <div class="cc-card">
                     <h2 style="font-family:var(--font-display);font-size:20px;font-weight:800;margin-bottom:24px"
                         th:text="${event.uid != null ? 'Rediģēt notikumu' : 'Pievienot notikumu'}">

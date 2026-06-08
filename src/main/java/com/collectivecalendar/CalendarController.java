@@ -96,14 +96,15 @@ public class CalendarController {
         Set<UUID> eventIds = groupEvents.stream()
                 .map(GroupEvent::getEventId)
                 .collect(Collectors.toSet());
-        List<Event> events = eventRepository.findAllById(eventIds);
+        // List<Event> events = eventRepository.findAllById(eventIds);
+        List<Event> events = eventRepository.findAll();
 
         List<Map<String, Object>> calendarEvents = new ArrayList<>();
 
         for (Event e : events) {
-            List<ZonedDateTime> eventInstances = eventService.getAllInstances(e);
-            LocalDateTime startTime = e.getStartTime().toLocalDateTime();
-            LocalDateTime endTime = e.getEndTime().toLocalDateTime();
+            List<LocalDateTime> eventInstances = eventService.getAllInstances(e);
+            LocalDateTime startTime = e.getStartTime();
+            LocalDateTime endTime = e.getEndTime();
 
             long daysDuration    = ChronoUnit.DAYS.between(startTime, endTime);
             long hoursDuration   = ChronoUnit.HOURS.between(startTime, endTime) % 24;
@@ -115,13 +116,12 @@ public class CalendarController {
                     .findFirst()
                     .orElse("Grupa");
 
-            for (ZonedDateTime instance : eventInstances) {
-                LocalDateTime start = instance.toLocalDateTime();
+            for (LocalDateTime instance : eventInstances) {
+                LocalDateTime start = instance;
                 LocalDateTime end = instance
                         .plusDays(daysDuration)
                         .plusHours(hoursDuration)
-                        .plusMinutes(minutesDuration)
-                        .toLocalDateTime();
+                        .plusMinutes(minutesDuration);
 
                 LocalDate eventDate = start.toLocalDate();
                 int dayIndex = (int) Duration.between(weekStart.atStartOfDay(), eventDate.atStartOfDay()).toDays();

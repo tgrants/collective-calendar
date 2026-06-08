@@ -1,6 +1,7 @@
 package com.collectivecalendar.model;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -27,20 +28,23 @@ public class Event {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "uid", updatable = false, nullable = false)
-	private UUID uid;
+	@Getter private UUID uid;
 
 	@Column(name = "name", nullable = false, length = 150)
 	@Getter @Setter private String name;
 
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	@Column(name = "start_time", nullable = false)
-	@Getter @Setter private ZonedDateTime startTime;
+	@Getter @Setter private LocalDateTime startTime;
 
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	@Column(name = "end_time", nullable = false)
-	@Getter @Setter private ZonedDateTime endTime;
+	@Getter @Setter private LocalDateTime endTime;
 
 	@Column(name = "frequency", length = 50)
 	@Getter @Setter private String frequency;
 
+	@DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
 	@Column(name = "until")
-	@Getter @Setter private ZonedDateTime until;
+	@Getter @Setter private LocalDateTime until;
 }
