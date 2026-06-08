@@ -481,7 +481,8 @@ body {
 .time-slot {
     height: 56px;
     display: flex;
-    align-items: flex-start;
+    align-items: center;
+    justify-content: center;
     padding-top: 4px;
     border-bottom: 1px solid var(--cc-border);
     border-right: 1px solid var(--cc-border);
