@@ -5,6 +5,7 @@ import com.collectivecalendar.event.service.EventService;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -54,5 +55,12 @@ public class EventController {
 		eventService.updateEvent(event, event_id);
 		
 		return "redirect:/calendar";
+	}
+	
+	@DeleteMapping("/groups/{group_id}/events/{event_id}/delete")
+	public String editEvent(@PathVariable UUID group_id, @PathVariable UUID event_id) {
+		eventService.deleteEvent(event_id);
+		
+		return "events/form";
 	}
 }
