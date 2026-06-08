@@ -7,17 +7,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Service
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class EventServiceImpl implements EventService  {
-
-	private final Event event;
-	
 	@Override
-	public ZonedDateTime getNextInstance(ZonedDateTime currentTime) {
-		List<ZonedDateTime> allInstances = getAllInstances();
+	public ZonedDateTime getNextInstance(Event event, ZonedDateTime currentTime) {
+		List<ZonedDateTime> allInstances = getAllInstances(event);
 		Iterator<ZonedDateTime> currentInstance = allInstances.iterator();
 		
 		while (currentInstance.hasNext()) {
@@ -32,7 +29,7 @@ public class EventServiceImpl implements EventService  {
 	}
 
 	@Override
-	public List<ZonedDateTime> getAllInstances() {
+	public List<ZonedDateTime> getAllInstances(Event event) {
 		List<ZonedDateTime> timeList = new ArrayList<>();
 		ZonedDateTime startTime = event.getStartTime();
 		ZonedDateTime endTime = event.getEndTime();

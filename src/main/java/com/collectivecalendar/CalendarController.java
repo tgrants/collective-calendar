@@ -90,9 +90,9 @@ public class CalendarController {
 
         List<Map<String, Object>> calendarEvents = new ArrayList<>();
 
+        EventService eventService = new EventServiceImpl();
         for (Event e : events) {
-        	EventService eventService = new EventServiceImpl(e);
-        	List<ZonedDateTime> eventInstances = eventService.getAllInstances();
+        	List<ZonedDateTime> eventInstances = eventService.getAllInstances(e);
         	LocalDateTime startTime = e.getStartTime().toLocalDateTime();
         	LocalDateTime endTime = e.getEndTime().toLocalDateTime();
         	
