@@ -22,11 +22,12 @@ import java.util.UUID;
             this.groupRepository = groupRepository;
         }
         // Iegūst sarakstu ar grupām, kam lietotājs pieder
-        @GetMapping
+        @GetMapping("/groups")
         public String groupList (Model model) {
             model.addAttribute("groups", groupRepository.findAll());
-            return "groups";
+            return "groups/list";
         }
+
         /*
         /CREATE
          */
@@ -35,7 +36,7 @@ import java.util.UUID;
         public String createGroup(Model model) {
 
             model.addAttribute("group", new Group());
-            return "form";
+            return "groups/form";
         }
 
         @PostMapping("/groups/create")
@@ -55,7 +56,7 @@ import java.util.UUID;
                       .orElseThrow(() -> new RuntimeException("Group not found: " + id));
 
               model.addAttribute("group", group);
-              return "form";
+              return "groups/form";
           }
 
         @PostMapping("/{id}/edit")
@@ -72,6 +73,8 @@ import java.util.UUID;
               service.deleteGroup(id);
               return "redirect:/groups";
           }
+
+
 
     }
 
