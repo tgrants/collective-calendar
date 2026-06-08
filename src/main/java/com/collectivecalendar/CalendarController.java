@@ -102,7 +102,7 @@ public class CalendarController {
         List<Map<String, Object>> calendarEvents = new ArrayList<>();
 
         for (Event e : events) {
-            List<LocalDateTime> eventInstances = eventService.getAllInstances(e);
+            List<LocalDateTime> eventInstances = eventService.getInstances(e, 100);
             LocalDateTime startTime = e.getStartTime();
             LocalDateTime endTime = e.getEndTime();
 

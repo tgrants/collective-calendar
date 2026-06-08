@@ -47,8 +47,8 @@ public class EventServiceImpl implements EventService  {
 	
 	@Override
 	public LocalDateTime getNextInstance(Event event, LocalDateTime currentTime) {
-		List<LocalDateTime> allInstances = getAllInstances(event);
-		Iterator<LocalDateTime> currentInstance = allInstances.iterator();
+		List<LocalDateTime> instances = getInstances(event, 365);
+		Iterator<LocalDateTime> currentInstance = instances.iterator();
 		
 		while (currentInstance.hasNext()) {
 			LocalDateTime tempTime = currentInstance.next();
@@ -61,26 +61,34 @@ public class EventServiceImpl implements EventService  {
 	}
 
 	@Override
-	public List<LocalDateTime> getAllInstances(Event event) {
+	public List<LocalDateTime> getInstances(Event event, int count) {
 		List<LocalDateTime> timeList = new ArrayList<>();
 		LocalDateTime startTime = event.getStartTime();
-		LocalDateTime untilTime = event.getUntil();
+		LocalDateTime untilTime;
+		if (event.getUntil() != null) {
+			untilTime = event.getUntil();
+		} else {
+			untilTime = LocalDateTime.now().plusYears(100);
+		}
 		String frequencyString = event.getFrequency();
 		
 		switch(frequencyString) {
 		case "DAILY":
-			for (LocalDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusDays(1)) {
+			for (LocalDateTime tempTime = startTime; !tempTime.isAfter(untilTime) && count > 0; tempTime = tempTime.plusDays(1)) {
 				timeList.add(tempTime);
+				count--;
 			}
 			break;
 		case "WEEKLY":
-			for (LocalDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusWeeks(1)) {
+			for (LocalDateTime tempTime = startTime; !tempTime.isAfter(untilTime) && count > 0; tempTime = tempTime.plusWeeks(1)) {
 				timeList.add(tempTime);
+				count--;
 			}
 			break;
 		case "MONTHLY":
-			for (LocalDateTime tempTime = startTime; !tempTime.isAfter(untilTime); tempTime = tempTime.plusMonths(1)) {
+			for (LocalDateTime tempTime = startTime; !tempTime.isAfter(untilTime) && count > 0; tempTime = tempTime.plusMonths(1)) {
 				timeList.add(tempTime);
+				count--;
 			}
 			break;
 		default:
