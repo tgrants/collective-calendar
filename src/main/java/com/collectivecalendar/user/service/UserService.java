@@ -72,4 +72,8 @@ public class UserService implements UserDetailsService {
 		// TODO: Integrate verification email dispatch service logic
 		System.out.println("Verification email requested for user: " + user.getEmail());
 	}
+	
+	public String encodePassword(String password) {
+		return passwordEncoder.encode(password);
+	}
 }

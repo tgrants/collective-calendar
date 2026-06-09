@@ -36,6 +36,7 @@
 						</button>
 					</form>
 				</div>
+				<!--
 				<div th:if="${currentUserRole != 'EDITOR'}">
 					<form th:action="@{/groups/{id}/leave(id=${group.uid})}" method="post">
 						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
@@ -45,6 +46,7 @@
 						</button>
 					</form>
 				</div>
+				-->
 			</div>
 		</div>
 
@@ -132,6 +134,7 @@
 									  th:classappend="${member.role == 'EDITOR'} ? 'editor' : 'viewer'"
 									  th:text="${member.role == 'EDITOR'} ? 'Redaktors' : 'Skatītājs'">Loma</span>
 							</div>
+							<!--
 							<form th:if="${currentUserRole == 'EDITOR' and member.role == 'VIEWER' and member.user.uid != currentUserUid}"
 								  th:action="@{/groups/{gid}/members/{uid}/promote(gid=${group.uid},uid=${member.user.uid})}"
 								  method="post">
@@ -141,6 +144,7 @@
 									<i class="bi bi-arrow-up-circle"></i>
 								</button>
 							</form>
+							-->
 						</div>
 					</div>
 
