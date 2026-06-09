@@ -23,7 +23,6 @@
 - Start application `docker compose up -d`
 - Stop application `docker compose down`
 - Remove all volumes `docker compose down -v`
-- Wipe database `docker compose rm postgres-db`
 
 The `-d` flag detaches the terminal.
 If you want to keep docker open in the terminal, remove this flag.
