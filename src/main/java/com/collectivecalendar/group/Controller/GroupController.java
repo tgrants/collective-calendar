@@ -103,197 +103,227 @@ public class GroupController {
 		return "groups/list";
 	}
 
-		/*
-		/CREATE
-		 */
+	/*
+	/CREATE
+		*/
 
-		@GetMapping("/groups/create")
-		public String createGroup(Model model) {
-			model.addAttribute("group", new Group());
+	@GetMapping("/groups/create")
+	public String createGroup(Model model) {
+		model.addAttribute("group", new Group());
+		return "groups/form";
+	}
+
+	@PostMapping("/groups/create")
+	public String createGroup(@ModelAttribute Group group,
+								@AuthenticationPrincipal UserDetails principal) {
+		User currentUser = userRepository.findByUsername(principal.getUsername())
+				.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+
+		service.createGroup(group.getName(), currentUser.getUid());
+		return "redirect:/groups";
+	}
+
+		/*
+	GRUPU REDIĢĒŠANA
+		*/
+		@GetMapping("/groups/{id}/edit")
+		public String editGroup(@PathVariable String id, Model model) {
+			UUID uuid = UUID.fromString(id);
+
+			Group group = groupRepository.findById(uuid)
+					.orElseThrow(() -> new RuntimeException("Group not found: " + id));
+
+			model.addAttribute("group", group);
 			return "groups/form";
 		}
 
-		@PostMapping("/groups/create")
-		public String createGroup(@ModelAttribute Group group,
-								  @AuthenticationPrincipal UserDetails principal) {
+	@PostMapping("/groups/{id}/edit")
+	public String editGroup(@PathVariable String id,
+							@ModelAttribute Group group) {
+
+		service.editGroup(id, group.getName());
+		return "redirect:/groups";
+	}
+		/*
+	GRUPU DzĒŠANA
+		*/
+		@PostMapping("/groups/{id}/delete")
+		public String deleteGroup(@PathVariable String id) {
+			service.deleteGroup(id);
+			return "redirect:/groups";
+		}
+
+	@GetMapping("/groups/{id}")
+	public String getGroup(@PathVariable String id,
+							@AuthenticationPrincipal UserDetails principal,
+							Model model) {
+		UUID groupId = UUID.fromString(id);
+
+		Group group = groupRepository.findById(groupId)
+				.orElseThrow(() -> new RuntimeException("Grupa netika atrasta: " + id));
+
+		User currentUser = userRepository.findByUsername(principal.getUsername())
+				.orElseThrow(() -> new RuntimeException("Lietotājs netika atrasts"));
+
+		UserGroup currentMembership = userGroupRepository.findByUserId(currentUser.getUid())
+				.stream()
+				.filter(userGroup -> userGroup.getGroupId().equals(groupId))
+				.findFirst()
+				.orElseThrow(() -> new RuntimeException("Tu neesi grupas dalībnieks"));
+
+		List<Map<String, Object>> members = new ArrayList<>();
+		for (UserGroup userGroup : userGroupRepository.findByGroupId(groupId)) {
+			User memberUser = userRepository.findById(userGroup.getUserId())
+					.orElse(null);
+			if (memberUser == null) {
+				continue;
+			}
+
+			Map<String, Object> member = new HashMap<>();
+			member.put("user", memberUser);
+			member.put("role", normalizeRole(userGroup.getRole()));
+			members.add(member);
+		}
+
+		List<Event> events = groupEventRepository.findByGroupId(groupId)
+				.stream()
+				.map(groupEvent -> eventRepository.findById(groupEvent.getEventId()).orElse(null))
+				.filter(java.util.Objects::nonNull)
+				.toList();
+
+		model.addAttribute("group", group);
+		model.addAttribute("members", members);
+		model.addAttribute("events", events);
+		model.addAttribute("eventCount", events.size());
+		model.addAttribute("memberCount", members.size());
+		model.addAttribute("currentUserRole", normalizeRole(currentMembership.getRole()));
+		model.addAttribute("currentUserUid", currentUser.getUid());
+		return "groups/detail";
+	}
+
+	@PostMapping("/groups/{id}/invite")
+	public String inviteToGroup(@PathVariable String id,
+								@RequestParam String username,
+								RedirectAttributes redirectAttributes) {
+		try {
+			groupUserService.inviteToGroup(username, id);
+			redirectAttributes.addFlashAttribute("successMessage",
+					"Ielūgums nosūtīts lietotājam " + username + ".");
+		} catch (IllegalArgumentException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		}
+
+		return "redirect:/groups/" + id;
+	}
+
+	@GetMapping("/groups/invites")
+	public String getInvites(@AuthenticationPrincipal UserDetails principal, Model model) {
+		User currentUser = userRepository.findByUsername(principal.getUsername())
+				.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+
+		List<Map<String, Object>> invites = new ArrayList<>();
+		for (var invite : inviteRepository.findByUserIdAndStatus(currentUser.getUid(), "PENDING")) {
+			Group inviteGroup = groupRepository.findById(invite.getGroupId()).orElse(null);
+			if (inviteGroup == null) {
+				continue;
+			}
+
+			Map<String, Object> inviteView = new HashMap<>();
+			inviteView.put("uid", invite.getUid());
+			inviteView.put("createdAt", invite.getCreatedAt());
+			inviteView.put("group", inviteGroup);
+			invites.add(inviteView);
+		}
+
+		model.addAttribute("invites", invites);
+		return "groups/invites";
+	}
+
+	@PostMapping("/groups/invites/{id}/accept")
+	public String acceptInvite(@PathVariable String id,
+								@AuthenticationPrincipal UserDetails principal,
+								RedirectAttributes redirectAttributes) {
+		try {
 			User currentUser = userRepository.findByUsername(principal.getUsername())
 					.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
-			service.createGroup(group.getName(), currentUser.getUid());
-			return "redirect:/groups";
+			var invite = inviteRepository.findById(UUID.fromString(id))
+					.orElseThrow(() -> new RuntimeException("Invite not found: " + id));
+
+			if (!invite.getUserId().equals(currentUser.getUid())) {
+				throw new RuntimeException("You cannot accept this invite");
+			}
+
+			groupUserService.joinGroup(currentUser.getUid().toString(), invite.getGroupId().toString());
+			redirectAttributes.addFlashAttribute("successMessage", "Ielūgums apstiprināts.");
+		} catch (RuntimeException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
 
-		  /*
-		GRUPU REDIĢĒŠANA
-		 */
-		  @GetMapping("/groups/{id}/edit")
-		  public String editGroup(@PathVariable String id, Model model) {
-			  UUID uuid = UUID.fromString(id);
+		return "redirect:/groups/invites";
+	}
 
-			  Group group = groupRepository.findById(uuid)
-					  .orElseThrow(() -> new RuntimeException("Group not found: " + id));
+	@PostMapping("/groups/invites/{id}/decline")
+	public String declineInvite(@PathVariable String id,
+								@AuthenticationPrincipal UserDetails principal,
+								RedirectAttributes redirectAttributes) {
+		try {
+			User currentUser = userRepository.findByUsername(principal.getUsername())
+					.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
-			  model.addAttribute("group", group);
-			  return "groups/form";
-		  }
+			var invite = inviteRepository.findById(UUID.fromString(id))
+					.orElseThrow(() -> new RuntimeException("Invite not found: " + id));
 
-		@PostMapping("/groups/{id}/edit")
-		public String editGroup(@PathVariable String id,
-								@ModelAttribute Group group) {
+			if (!invite.getUserId().equals(currentUser.getUid())) {
+				throw new RuntimeException("You cannot decline this invite");
+			}
 
-			service.editGroup(id, group.getName());
-			return "redirect:/groups";
+			invite.setStatus("DECLINED");
+			inviteRepository.save(invite);
+			redirectAttributes.addFlashAttribute("successMessage", "Ielūgums noraidīts.");
+		} catch (RuntimeException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 		}
-		  /*
-		GRUPU DzĒŠANA
-		 */
-		  @PostMapping("/groups/{id}/delete")
-		  public String deleteGroup(@PathVariable String id) {
-			  service.deleteGroup(id);
-			  return "redirect:/groups";
-		  }
 
-		@GetMapping("/groups/{id}")
-		public String getGroup(@PathVariable String id,
-							   @AuthenticationPrincipal UserDetails principal,
-							   Model model) {
+		return "redirect:/groups/invites";
+	}
+
+	private String normalizeRole(String role) {
+		if ("ADMIN".equals(role) || "EDITOR".equals(role)) {
+			return "EDITOR";
+		}
+		return "VIEWER";
+	}
+
+	@PostMapping("/groups/{id}/leave")
+	public String leaveGroup(
+		@PathVariable String id,
+		@AuthenticationPrincipal UserDetails principal,
+		RedirectAttributes redirectAttributes
+	) {
+		try {
 			UUID groupId = UUID.fromString(id);
 
-			Group group = groupRepository.findById(groupId)
-					.orElseThrow(() -> new RuntimeException("Grupa netika atrasta: " + id));
-
 			User currentUser = userRepository.findByUsername(principal.getUsername())
-					.orElseThrow(() -> new RuntimeException("Lietotājs netika atrasts"));
+					.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
 
-			UserGroup currentMembership = userGroupRepository.findByUserId(currentUser.getUid())
+			UserGroup membership = userGroupRepository.findByUserId(currentUser.getUid())
 					.stream()
-					.filter(userGroup -> userGroup.getGroupId().equals(groupId))
+					.filter(ug -> ug.getGroupId().equals(groupId))
 					.findFirst()
-					.orElseThrow(() -> new RuntimeException("Tu neesi grupas dalībnieks"));
+					.orElseThrow(() -> new RuntimeException("Tu neesi šīs grupas dalībnieks"));
 
-			List<Map<String, Object>> members = new ArrayList<>();
-			for (UserGroup userGroup : userGroupRepository.findByGroupId(groupId)) {
-				User memberUser = userRepository.findById(userGroup.getUserId())
-						.orElse(null);
-				if (memberUser == null) {
-					continue;
-				}
-
-				Map<String, Object> member = new HashMap<>();
-				member.put("user", memberUser);
-				member.put("role", normalizeRole(userGroup.getRole()));
-				members.add(member);
+			if ("EDITOR".equals(normalizeRole(membership.getRole()))) {
+				throw new IllegalStateException("Redaktori nevar iziet no grupas.");
 			}
 
-			List<Event> events = groupEventRepository.findByGroupId(groupId)
-					.stream()
-					.map(groupEvent -> eventRepository.findById(groupEvent.getEventId()).orElse(null))
-					.filter(java.util.Objects::nonNull)
-					.toList();
-
-			model.addAttribute("group", group);
-			model.addAttribute("members", members);
-			model.addAttribute("events", events);
-			model.addAttribute("eventCount", events.size());
-			model.addAttribute("memberCount", members.size());
-			model.addAttribute("currentUserRole", normalizeRole(currentMembership.getRole()));
-			model.addAttribute("currentUserUid", currentUser.getUid());
-			return "groups/detail";
-		}
-
-		@PostMapping("/groups/{id}/invite")
-		public String inviteToGroup(@PathVariable String id,
-									@RequestParam String username,
-									RedirectAttributes redirectAttributes) {
-			try {
-				groupUserService.inviteToGroup(username, id);
-				redirectAttributes.addFlashAttribute("successMessage",
-						"Ielūgums nosūtīts lietotājam " + username + ".");
-			} catch (IllegalArgumentException e) {
-				redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-			}
-
+			userGroupRepository.delete(membership);
+			redirectAttributes.addFlashAttribute("successMessage", "Jūs esat izgājuši no grupas.");
+		} catch (RuntimeException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
 			return "redirect:/groups/" + id;
 		}
 
-		@GetMapping("/groups/invites")
-		public String getInvites(@AuthenticationPrincipal UserDetails principal, Model model) {
-			User currentUser = userRepository.findByUsername(principal.getUsername())
-					.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
-
-			List<Map<String, Object>> invites = new ArrayList<>();
-			for (var invite : inviteRepository.findByUserIdAndStatus(currentUser.getUid(), "PENDING")) {
-				Group inviteGroup = groupRepository.findById(invite.getGroupId()).orElse(null);
-				if (inviteGroup == null) {
-					continue;
-				}
-
-				Map<String, Object> inviteView = new HashMap<>();
-				inviteView.put("uid", invite.getUid());
-				inviteView.put("createdAt", invite.getCreatedAt());
-				inviteView.put("group", inviteGroup);
-				invites.add(inviteView);
-			}
-
-			model.addAttribute("invites", invites);
-			return "groups/invites";
-		}
-
-		@PostMapping("/groups/invites/{id}/accept")
-		public String acceptInvite(@PathVariable String id,
-								   @AuthenticationPrincipal UserDetails principal,
-								   RedirectAttributes redirectAttributes) {
-			try {
-				User currentUser = userRepository.findByUsername(principal.getUsername())
-						.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
-
-				var invite = inviteRepository.findById(UUID.fromString(id))
-						.orElseThrow(() -> new RuntimeException("Invite not found: " + id));
-
-				if (!invite.getUserId().equals(currentUser.getUid())) {
-					throw new RuntimeException("You cannot accept this invite");
-				}
-
-				groupUserService.joinGroup(currentUser.getUid().toString(), invite.getGroupId().toString());
-				redirectAttributes.addFlashAttribute("successMessage", "Ielūgums apstiprināts.");
-			} catch (RuntimeException e) {
-				redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-			}
-
-			return "redirect:/groups/invites";
-		}
-
-		@PostMapping("/groups/invites/{id}/decline")
-		public String declineInvite(@PathVariable String id,
-									@AuthenticationPrincipal UserDetails principal,
-									RedirectAttributes redirectAttributes) {
-			try {
-				User currentUser = userRepository.findByUsername(principal.getUsername())
-						.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
-
-				var invite = inviteRepository.findById(UUID.fromString(id))
-						.orElseThrow(() -> new RuntimeException("Invite not found: " + id));
-
-				if (!invite.getUserId().equals(currentUser.getUid())) {
-					throw new RuntimeException("You cannot decline this invite");
-				}
-
-				invite.setStatus("DECLINED");
-				inviteRepository.save(invite);
-				redirectAttributes.addFlashAttribute("successMessage", "Ielūgums noraidīts.");
-			} catch (RuntimeException e) {
-				redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-			}
-
-			return "redirect:/groups/invites";
-		}
-
-		private String normalizeRole(String role) {
-			if ("ADMIN".equals(role) || "EDITOR".equals(role)) {
-				return "EDITOR";
-			}
-			return "VIEWER";
-		}
-
+		return "redirect:/groups";
+	}
 }
-
