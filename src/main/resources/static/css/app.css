@@ -87,7 +87,7 @@ body {
 
 .brand-name strong {
 	color: #fff;
-	font-weight: 700;
+	font-weight: 600;
 	font-size: 15px;
 }
 
@@ -141,7 +141,7 @@ body {
 	background: var(--cc-danger);
 	color: #fff;
 	font-size: 10px;
-	font-weight: 700;
+	font-weight: 600;
 	min-width: 18px; height: 18px;
 	border-radius: 9px;
 	display: grid; place-items: center;
@@ -166,7 +166,7 @@ body {
 	display: grid; place-items: center;
 	color: #fff;
 	font-family: var(--font-display);
-	font-weight: 700;
+	font-weight: 600;
 	font-size: 14px;
 	flex-shrink: 0;
 }
@@ -233,7 +233,7 @@ body {
 .page-title {
 	font-family: var(--font-display);
 	font-size: 20px;
-	font-weight: 700;
+	font-weight: 600;
 	margin: 0;
 	flex: 1;
 }
@@ -279,7 +279,7 @@ body {
 .cc-card-title {
 	font-family: var(--font-display);
 	font-size: 16px;
-	font-weight: 700;
+	font-weight: 600;
 	margin: 0;
 }
 
@@ -422,7 +422,7 @@ body {
 .calendar-nav .week-label {
 	font-family: var(--font-display);
 	font-size: 18px;
-	font-weight: 700;
+	font-weight: 600;
 	flex: 1;
 	text-align: center;
 }
@@ -461,7 +461,7 @@ body {
 .week-header-cell .day-num {
 	font-family: var(--font-display);
 	font-size: 22px;
-	font-weight: 800;
+	font-weight: 600;
 	color: var(--cc-text);
 	line-height: 1.1;
 }
@@ -571,7 +571,7 @@ body {
 .group-card-name {
 	font-family: var(--font-display);
 	font-size: 16px;
-	font-weight: 700;
+	font-weight: 600;
 	margin: 0;
 	line-height: 1.2;
 }
@@ -588,7 +588,7 @@ body {
 
 .role-badge {
 	font-size: 11px;
-	font-weight: 700;
+	font-weight: 600;
 	padding: 2px 8px;
 	border-radius: 6px;
 	text-transform: uppercase;
@@ -616,7 +616,7 @@ body {
 
 .events-table thead th {
 	font-size: 11px;
-	font-weight: 700;
+	font-weight: 600;
 	letter-spacing: .06em;
 	text-transform: uppercase;
 	color: var(--cc-text-muted);
@@ -702,7 +702,7 @@ body {
 }
 
 .invite-info { flex: 1; }
-.invite-group { font-weight: 700; font-size: 15px; }
+.invite-group { font-weight: 600; font-size: 15px; }
 .invite-date  { font-size: 12px; color: var(--cc-text-muted); }
 .invite-actions { display: flex; gap: 8px; }
 
@@ -786,14 +786,14 @@ body {
 .auth-logo-name {
 	font-family: var(--font-display);
 	font-size: 20px;
-	font-weight: 800;
+	font-weight: 600;
 	line-height: 1.1;
 }
 
 .auth-heading {
 	font-family: var(--font-display);
 	font-size: 28px;
-	font-weight: 800;
+	font-weight: 600;
 	margin-bottom: 6px;
 }
 
@@ -816,7 +816,7 @@ body {
 .auth-visual-title {
 	font-family: var(--font-display);
 	font-size: 32px;
-	font-weight: 800;
+	font-weight: 600;
 	margin-bottom: 16px;
 	text-align: center;
 }
@@ -856,7 +856,7 @@ body {
 .page-header h2 {
 	font-family: var(--font-display);
 	font-size: 22px;
-	font-weight: 800;
+	font-weight: 600;
 	margin: 0;
 }
 
