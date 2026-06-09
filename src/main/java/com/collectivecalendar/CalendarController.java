@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -106,8 +107,12 @@ public class CalendarController {
 		Set<UUID> eventIds = groupEvents.stream()
 				.map(GroupEvent::getEventId)
 				.collect(Collectors.toSet());
-		// List<Event> events = eventRepository.findAllById(eventIds);
-		List<Event> events = eventRepository.findAll();
+		
+		List<Event> events = new ArrayList<>();
+		Iterator<UUID> eventIdsIterator = eventIds.iterator();
+		while (eventIdsIterator.hasNext()) {
+			events.add(eventRepository.findById(eventIdsIterator.next()).orElseThrow());
+		}
 
 		List<Map<String, Object>> calendarEvents = new ArrayList<>();
 

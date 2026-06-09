@@ -13,6 +13,4 @@ import com.collectivecalendar.model.Event;
 public interface EventRepository extends JpaRepository<Event, UUID> {
 	Optional<Event> findById(UUID eventId);
 	void deleteById(UUID eventId);
-	// List<Event> findAllById(Set<UUID> eventIds);
-	List<Event> findAll();
 }
