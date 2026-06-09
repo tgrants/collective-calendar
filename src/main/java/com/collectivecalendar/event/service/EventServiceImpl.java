@@ -18,7 +18,8 @@ public class EventServiceImpl implements EventService  {
 	
 	@Override
 	public Event findEvent(UUID eventId) {
-		Event event = eventRepository.findById(eventId).orElseThrow();
+		Event event = eventRepository.findById(eventId)
+				.orElseThrow(() -> new RuntimeException("Neatrada notikumu: " + eventId));
 		return event;
 	}
 	
@@ -29,7 +30,8 @@ public class EventServiceImpl implements EventService  {
 	
 	@Override
 	public void updateEvent(Event event, UUID eventId) {
-		Event existingEvent = eventRepository.findById(eventId).orElseThrow();
+		Event existingEvent = eventRepository.findById(eventId)
+				.orElseThrow(() -> new RuntimeException("Neatrada notikumu: " + eventId));
 		
 		existingEvent.setName(event.getName());
 		existingEvent.setStartTime(event.getStartTime());
