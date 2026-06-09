@@ -4,165 +4,165 @@
 <body>
 
 <div th:replace="fragments/layout :: body('Grupa', ~{::main-content})">
-    <th:block th:fragment="main-content">
+	<th:block th:fragment="main-content">
 
-        <div class="cc-card mb-4">
-            <div class="d-flex align-items-center gap-4 flex-wrap">
-                <div class="group-icon" style="width:56px;height:56px;font-size:24px;background:#eef1fe;color:#4f6ef7;border-radius:14px">
-                    <i class="bi bi-people-fill"></i>
-                </div>
-                <div style="flex:1">
-                    <h2 style="font-family:var(--font-display);font-size:24px;font-weight:800;margin:0" th:text="${group.name}">Grupas nosaukums</h2>
-                    <div class="d-flex gap-3 mt-1 flex-wrap" style="font-size:13px;color:var(--cc-text-muted)">
-                        <span><i class="bi bi-calendar2-event me-1"></i><span th:text="${eventCount}">0</span> notikumi</span>
-                        <span><i class="bi bi-people me-1"></i><span th:text="${memberCount}">0</span> dalībnieki</span>
-                        <span>
-                            Jūsu loma:
-                            <span class="role-badge ms-1"
-                                  th:classappend="${currentUserRole == 'EDITOR'} ? 'editor' : 'viewer'"
-                                  th:text="${currentUserRole == 'EDITOR'} ? 'Redaktors' : 'Skatītājs'">Loma</span>
-                        </span>
-                    </div>
-                </div>
-                <div class="d-flex gap-2" th:if="${currentUserRole == 'EDITOR'}">
-                    <a th:href="@{/groups/{id}/edit(id=${group.uid})}" class="btn-cc-ghost">
-                        <i class="bi bi-pencil"></i> Rediģēt
-                    </a>
-                    <form th:action="@{/groups/{id}/delete(id=${group.uid})}" method="post" class="d-inline">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <button type="submit" class="btn-cc-danger"
-                                data-confirm="Vai tiešām vēlaties dzēst šo grupu? Šī darbība nav atgriezeniska.">
-                            <i class="bi bi-trash"></i> Dzēst grupu
-                        </button>
-                    </form>
-                </div>
-                <div th:if="${currentUserRole != 'EDITOR'}">
-                    <form th:action="@{/groups/{id}/leave(id=${group.uid})}" method="post">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                        <button type="submit" class="btn-cc-ghost"
-                                data-confirm="Vai tiešām vēlaties iziet no šīs grupas?">
-                            <i class="bi bi-box-arrow-right"></i> Iziet no grupas
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
+		<div class="cc-card mb-4">
+			<div class="d-flex align-items-center gap-4 flex-wrap">
+				<div class="group-icon" style="width:56px;height:56px;font-size:24px;background:#eef1fe;color:#4f6ef7;border-radius:14px">
+					<i class="bi bi-people-fill"></i>
+				</div>
+				<div style="flex:1">
+					<h2 style="font-family:var(--font-display);font-size:24px;font-weight:800;margin:0" th:text="${group.name}">Grupas nosaukums</h2>
+					<div class="d-flex gap-3 mt-1 flex-wrap" style="font-size:13px;color:var(--cc-text-muted)">
+						<span><i class="bi bi-calendar2-event me-1"></i><span th:text="${eventCount}">0</span> notikumi</span>
+						<span><i class="bi bi-people me-1"></i><span th:text="${memberCount}">0</span> dalībnieki</span>
+						<span>
+							Jūsu loma:
+							<span class="role-badge ms-1"
+								  th:classappend="${currentUserRole == 'EDITOR'} ? 'editor' : 'viewer'"
+								  th:text="${currentUserRole == 'EDITOR'} ? 'Redaktors' : 'Skatītājs'">Loma</span>
+						</span>
+					</div>
+				</div>
+				<div class="d-flex gap-2" th:if="${currentUserRole == 'EDITOR'}">
+					<a th:href="@{/groups/{id}/edit(id=${group.uid})}" class="btn-cc-ghost">
+						<i class="bi bi-pencil"></i> Rediģēt
+					</a>
+					<form th:action="@{/groups/{id}/delete(id=${group.uid})}" method="post" class="d-inline">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+						<button type="submit" class="btn-cc-danger"
+								data-confirm="Vai tiešām vēlaties dzēst šo grupu? Šī darbība nav atgriezeniska.">
+							<i class="bi bi-trash"></i> Dzēst grupu
+						</button>
+					</form>
+				</div>
+				<div th:if="${currentUserRole != 'EDITOR'}">
+					<form th:action="@{/groups/{id}/leave(id=${group.uid})}" method="post">
+						<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+						<button type="submit" class="btn-cc-ghost"
+								data-confirm="Vai tiešām vēlaties iziet no šīs grupas?">
+							<i class="bi bi-box-arrow-right"></i> Iziet no grupas
+						</button>
+					</form>
+				</div>
+			</div>
+		</div>
 
-        <div class="row g-4">
-            <div class="col-lg-8">
-                <div class="cc-card">
-                    <div class="cc-card-header">
-                        <h3 class="cc-card-title">Notikumi</h3>
-                        <a th:if="${currentUserRole == 'EDITOR'}"
-                           th:href="@{/groups/{id}/events/create(id=${group.uid})}"
-                           class="btn-cc-primary" style="font-size:13px;padding:7px 14px">
-                            <i class="bi bi-plus-lg"></i> Pievienot
-                        </a>
-                    </div>
+		<div class="row g-4">
+			<div class="col-lg-8">
+				<div class="cc-card">
+					<div class="cc-card-header">
+						<h3 class="cc-card-title">Notikumi</h3>
+						<a th:if="${currentUserRole == 'EDITOR'}"
+						   th:href="@{/groups/{id}/events/create(id=${group.uid})}"
+						   class="btn-cc-primary" style="font-size:13px;padding:7px 14px">
+							<i class="bi bi-plus-lg"></i> Pievienot
+						</a>
+					</div>
 
-                    <div th:if="${not #lists.isEmpty(events)}">
-                        <table class="events-table">
-                            <thead>
-                                <tr>
-                                    <th>Notikums</th>
-                                    <th>Sākums</th>
-                                    <th>Beigas</th>
-                                    <th th:if="${currentUserRole == 'EDITOR'}"></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr th:each="event : ${events}">
-                                    <td class="event-name-cell">
-                                        <span th:text="${event.name}">Notikuma nosaukums</span>
-                                        <span class="repeat-badge" th:if="${event.frequency != null}">
-                                            <i class="bi bi-arrow-repeat"></i>
-                                            <span th:text="${event.frequency}">Atkārtojas</span>
-                                        </span>
-                                    </td>
-                                    <td style="color:var(--cc-text-muted)">
-                                        <span th:text="${#temporals.format(event.startTime, 'dd.MM.yyyy HH:mm')}">01.01.2024 09:00</span>
-                                    </td>
-                                    <td style="color:var(--cc-text-muted)">
-                                        <span th:text="${#temporals.format(event.endTime, 'dd.MM.yyyy HH:mm')}">01.01.2024 10:00</span>
-                                    </td>
-                                    <td class="action-cell" th:if="${currentUserRole == 'EDITOR'}">
-                                        <a th:href="@{/groups/{gid}/events/{eid}/edit(gid=${group.uid},eid=${event.uid})}"
-                                           class="icon-btn" title="Rediģēt">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                        <form th:action="@{/groups/{gid}/events/{eid}/delete(gid=${group.uid},eid=${event.uid})}"
-                                              method="post" class="d-inline">
-                                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                            <button type="submit" class="icon-btn danger"
-                                                    data-confirm="Dzēst šo notikumu?"
-                                                    title="Dzēst">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+					<div th:if="${not #lists.isEmpty(events)}">
+						<table class="events-table">
+							<thead>
+								<tr>
+									<th>Notikums</th>
+									<th>Sākums</th>
+									<th>Beigas</th>
+									<th th:if="${currentUserRole == 'EDITOR'}"></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="event : ${events}">
+									<td class="event-name-cell">
+										<span th:text="${event.name}">Notikuma nosaukums</span>
+										<span class="repeat-badge" th:if="${event.frequency != null}">
+											<i class="bi bi-arrow-repeat"></i>
+											<span th:text="${event.frequency}">Atkārtojas</span>
+										</span>
+									</td>
+									<td style="color:var(--cc-text-muted)">
+										<span th:text="${#temporals.format(event.startTime, 'dd.MM.yyyy HH:mm')}">01.01.2024 09:00</span>
+									</td>
+									<td style="color:var(--cc-text-muted)">
+										<span th:text="${#temporals.format(event.endTime, 'dd.MM.yyyy HH:mm')}">01.01.2024 10:00</span>
+									</td>
+									<td class="action-cell" th:if="${currentUserRole == 'EDITOR'}">
+										<a th:href="@{/groups/{gid}/events/{eid}/edit(gid=${group.uid},eid=${event.uid})}"
+										   class="icon-btn" title="Rediģēt">
+											<i class="bi bi-pencil"></i>
+										</a>
+										<form th:action="@{/groups/{gid}/events/{eid}/delete(gid=${group.uid},eid=${event.uid})}"
+											  method="post" class="d-inline">
+											<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+											<button type="submit" class="icon-btn danger"
+													data-confirm="Dzēst šo notikumu?"
+													title="Dzēst">
+												<i class="bi bi-trash"></i>
+											</button>
+										</form>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
 
-                    <div th:if="${#lists.isEmpty(events)}" class="empty-state" style="padding:40px">
-                        <i class="bi bi-calendar-x d-block"></i>
-                        <h3>Nav notikumu</h3>
-                        <p th:if="${currentUserRole == 'EDITOR'}">Pievienojiet pirmo notikumu šai grupai.</p>
-                        <p th:if="${currentUserRole != 'EDITOR'}">Redaktors vēl nav pievienojis nevienu notikumu.</p>
-                    </div>
-                </div>
-            </div>
+					<div th:if="${#lists.isEmpty(events)}" class="empty-state" style="padding:40px">
+						<i class="bi bi-calendar-x d-block"></i>
+						<h3>Nav notikumu</h3>
+						<p th:if="${currentUserRole == 'EDITOR'}">Pievienojiet pirmo notikumu šai grupai.</p>
+						<p th:if="${currentUserRole != 'EDITOR'}">Redaktors vēl nav pievienojis nevienu notikumu.</p>
+					</div>
+				</div>
+			</div>
 
-            <div class="col-lg-4">
-                <div class="cc-card">
-                    <div class="cc-card-header">
-                        <h3 class="cc-card-title">Dalībnieki</h3>
-                    </div>
+			<div class="col-lg-4">
+				<div class="cc-card">
+					<div class="cc-card-header">
+						<h3 class="cc-card-title">Dalībnieki</h3>
+					</div>
 
-                    <div class="d-flex flex-column gap-2">
-                        <div th:each="member : ${members}"
-                             class="d-flex align-items-center gap-3 p-2 rounded-2"
-                             style="background:var(--cc-surface-2)">
-                            <div class="user-avatar" style="font-size:13px"
-                                 th:text="${#strings.substring(member.user.username, 0, 1).toUpperCase()}">U</div>
-                            <div style="flex:1">
-                                <div style="font-weight:600;font-size:14px" th:text="${member.user.username}">lietotājs</div>
-                                <span class="role-badge"
-                                      th:classappend="${member.role == 'EDITOR'} ? 'editor' : 'viewer'"
-                                      th:text="${member.role == 'EDITOR'} ? 'Redaktors' : 'Skatītājs'">Loma</span>
-                            </div>
-                            <form th:if="${currentUserRole == 'EDITOR' and member.role == 'VIEWER' and member.user.uid != currentUserUid}"
-                                  th:action="@{/groups/{gid}/members/{uid}/promote(gid=${group.uid},uid=${member.user.uid})}"
-                                  method="post">
-                                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                                <button type="submit" class="icon-btn" title="Piešķirt redaktora lomu"
-                                        data-confirm="Piešķirt redaktora lomu lietotājam?">
-                                    <i class="bi bi-arrow-up-circle"></i>
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+					<div class="d-flex flex-column gap-2">
+						<div th:each="member : ${members}"
+							 class="d-flex align-items-center gap-3 p-2 rounded-2"
+							 style="background:var(--cc-surface-2)">
+							<div class="user-avatar" style="font-size:13px"
+								 th:text="${#strings.substring(member.user.username, 0, 1).toUpperCase()}">U</div>
+							<div style="flex:1">
+								<div style="font-weight:600;font-size:14px" th:text="${member.user.username}">lietotājs</div>
+								<span class="role-badge"
+									  th:classappend="${member.role == 'EDITOR'} ? 'editor' : 'viewer'"
+									  th:text="${member.role == 'EDITOR'} ? 'Redaktors' : 'Skatītājs'">Loma</span>
+							</div>
+							<form th:if="${currentUserRole == 'EDITOR' and member.role == 'VIEWER' and member.user.uid != currentUserUid}"
+								  th:action="@{/groups/{gid}/members/{uid}/promote(gid=${group.uid},uid=${member.user.uid})}"
+								  method="post">
+								<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+								<button type="submit" class="icon-btn" title="Piešķirt redaktora lomu"
+										data-confirm="Piešķirt redaktora lomu lietotājam?">
+									<i class="bi bi-arrow-up-circle"></i>
+								</button>
+							</form>
+						</div>
+					</div>
 
-                    <div th:if="${currentUserRole == 'EDITOR'}" class="mt-4">
-                        <div class="divider"></div>
-                        <p style="font-size:13px;font-weight:600;margin-bottom:10px">Uzaicināt lietotāju</p>
-                        <form th:action="@{/groups/{id}/invite(id=${group.uid})}" method="post">
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
-                            <div class="d-flex gap-2">
-                                <input type="text" name="username" class="cc-input"
-                                       placeholder="lietotājvārds" style="flex:1" required>
-                                <button type="submit" class="btn-cc-primary" style="padding:9px 14px">
-                                    <i class="bi bi-send"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+					<div th:if="${currentUserRole == 'EDITOR'}" class="mt-4">
+						<div class="divider"></div>
+						<p style="font-size:13px;font-weight:600;margin-bottom:10px">Uzaicināt lietotāju</p>
+						<form th:action="@{/groups/{id}/invite(id=${group.uid})}" method="post">
+							<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+							<div class="d-flex gap-2">
+								<input type="text" name="username" class="cc-input"
+									   placeholder="lietotājvārds" style="flex:1" required>
+								<button type="submit" class="btn-cc-primary" style="padding:9px 14px">
+									<i class="bi bi-send"></i>
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
 
-    </th:block>
+	</th:block>
 </div>
 
 </body>

@@ -22,7 +22,7 @@
 - Build and start (force recompile) `docker compose up -d --build`
 - Start application `docker compose up -d`
 - Stop application `docker compose down`
-- Wipe database `docker compose down -v`
+- Remove all volumes `docker compose down -v`
 
 The `-d` flag detaches the terminal.
 If you want to keep docker open in the terminal, remove this flag.

@@ -1,5 +1,6 @@
 package com.collectivecalendar.model;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import jakarta.persistence.Column;
@@ -54,4 +55,7 @@ public class Notification {
 
 	@Column(name = "notify_uid")
 	private UUID notifyUid;
+
+	@Column(name = "scheduled_for", nullable = false)
+	private LocalDateTime scheduledFor;
 }

@@ -36,6 +36,7 @@ CREATE TABLE notifications (
 	notify_event_uid UUID NOT NULL,
 	type VARCHAR(50) NOT NULL,
 	status VARCHAR(50) NOT NULL,
+	scheduled_for TIMESTAMP NOT NULL,
 	retries INT NOT NULL DEFAULT 0,
 	seen BOOLEAN NOT NULL DEFAULT FALSE,
 	notify_uid UUID REFERENCES notify(uid) ON DELETE CASCADE
