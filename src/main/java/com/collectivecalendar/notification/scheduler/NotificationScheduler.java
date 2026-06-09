@@ -1,7 +1,7 @@
 package com.collectivecalendar.notification.scheduler;
 
-import java.util.List;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -69,8 +69,8 @@ public class NotificationScheduler {
 					continue;
 				}
 
-				if (!user.isVerified()) {
-					log.info("Skipping notification {}: User {} has disabled global calendar notifications.", notification.getUid(), user.getUsername());
+				if (!user.isCalendarNotify()) {
+					log.info("Skipping notification {}: User {} has disabled calendar notifications.", notification.getUid(), user.getUsername());
 					notification.setStatus(NotificationStatus.FAILED);
 					continue;
 				}

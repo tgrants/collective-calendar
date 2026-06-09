@@ -17,12 +17,14 @@ import com.collectivecalendar.model.Notification;
 import com.collectivecalendar.model.NotificationStatus;
 import com.collectivecalendar.model.NotificationType;
 import com.collectivecalendar.model.Notify;
+import com.collectivecalendar.model.User;
 import com.collectivecalendar.model.UserGroup;
 import com.collectivecalendar.repository.EventRepository;
 import com.collectivecalendar.repository.GroupEventRepository;
 import com.collectivecalendar.repository.NotificationRepository;
 import com.collectivecalendar.repository.NotifyRepository;
 import com.collectivecalendar.repository.UserGroupRepository;
+import com.collectivecalendar.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +40,7 @@ public class NotificationGeneratorService {
 	private final UserGroupRepository userGroupRepository;
 	private final NotificationRepository notificationRepository;
 	private final NotifyRepository notifyRepository;
+	private final UserRepository userRepository;
 
 	private static final int PRE_GENERATE_COUNT = 3;
 
@@ -79,7 +82,7 @@ public class NotificationGeneratorService {
 	private void stageInstancesForEvent(Event event, List<LocalDateTime> instances, LocalDateTime now) {
 		List<GroupEvent> groupEvents = groupEventRepository.findByEventId(event.getUid());
 
-		LocalDateTime gracePeriodLimit = now.minusMinutes(5);
+		LocalDateTime gracePeriodLimit = now.minusMinutes(1);
 
 		for (GroupEvent groupEvent : groupEvents) {
 			List<UserGroup> activeSubscribers = userGroupRepository.findByGroupIdAndNotifyTrue(groupEvent.getGroupId());
@@ -89,12 +92,15 @@ public class NotificationGeneratorService {
 				Notify overrideConfig = notifyRepository.findByUserUidAndEventUid(userId, event.getUid()).orElse(null);
 				UUID notifyUid = (overrideConfig != null) ? overrideConfig.getUid() : null;
 
+				User user = userRepository.findById(userId).orElse(null);
+				if (user == null) continue;
+
 				for (LocalDateTime instanceTime : instances) {
 					if (instanceTime.isBefore(gracePeriodLimit)) {
 					continue; 
 				}
 
-					if (overrideConfig == null || overrideConfig.isNotifyEmail()) {
+					if (user.isCalendarNotify() && (overrideConfig == null || overrideConfig.isNotifyEmail())) {
 						boolean exists = notificationRepository.existsByNotifyUserUidAndNotifyEventUidAndScheduledForAndType(
 								userId, event.getUid(), instanceTime, NotificationType.EMAIL
 						);
@@ -112,7 +118,7 @@ public class NotificationGeneratorService {
 						}
 					}
 
-					if (overrideConfig == null || overrideConfig.isNotifyInapp()) {
+					if (user.isCalendarNotify() && (overrideConfig == null || overrideConfig.isNotifyInapp())) {
 						NotificationType reminderType = NotificationType.IN_APP;
 						boolean exists = notificationRepository.existsByNotifyUserUidAndNotifyEventUidAndScheduledForAndType(
 								userId, event.getUid(), instanceTime, reminderType
