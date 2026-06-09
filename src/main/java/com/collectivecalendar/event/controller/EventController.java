@@ -1,6 +1,7 @@
 package com.collectivecalendar.event.controller;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import org.springframework.stereotype.Controller;
@@ -25,8 +26,8 @@ public class EventController {
 	@GetMapping("/groups/{group_id}/events/create")
 	public String createEvent(@PathVariable UUID group_id, Model model) {
 		Event event = new Event();
-		event.setStartTime(LocalDateTime.now());
-		event.setEndTime(LocalDateTime.now());
+		event.setStartTime(LocalDateTime.now(ZoneOffset.ofHours(3)));
+		event.setEndTime(LocalDateTime.now(ZoneOffset.ofHours(3)));
 
 		model.addAttribute("groupUid", group_id);
 		model.addAttribute("event", event);

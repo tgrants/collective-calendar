@@ -1,6 +1,7 @@
 package com.collectivecalendar.notification.scheduler;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,7 +44,7 @@ public class NotificationScheduler {
 			NotificationStatus.PENDING, 
 			NotificationType.EMAIL, 
 			MAX_RETRY_LIMIT,
-			LocalDateTime.now()
+			LocalDateTime.now(ZoneOffset.ofHours(3))
 		);
 
 		if (pendingEmails.isEmpty()) {
