@@ -1,5 +1,6 @@
 package com.collectivecalendar.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -12,13 +13,17 @@ import com.collectivecalendar.model.NotificationType;
 
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, UUID> {
-	List<Notification> findByStatusAndTypeAndRetriesLessThan(
+	List<Notification> findByStatusAndTypeAndRetriesLessThanAndScheduledForLessThanEqual(
 		NotificationStatus status, 
 		NotificationType type, 
-		int maxRetries
+		int maxRetries, 
+		LocalDateTime dateTime
 	);
 
 	List<Notification> findByNotifyUserUid(UUID userUid);
 
 	List<Notification> findByNotifyUserUidAndSeenFalse(UUID userUid);
+
+	boolean existsByNotifyUserUidAndNotifyEventUidAndScheduledForAndType(
+		UUID userUid, UUID eventUid, LocalDateTime scheduledFor, NotificationType type);
 }

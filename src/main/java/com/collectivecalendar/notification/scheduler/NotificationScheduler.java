@@ -1,6 +1,7 @@
 package com.collectivecalendar.notification.scheduler;
 
 import java.util.List;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,10 +39,11 @@ public class NotificationScheduler {
 	@Scheduled(cron = "0 */1 * * * *") // Runs every minute
 	@Transactional
 	public void processPendingEmailQueue() {
-		List<Notification> pendingEmails = notificationRepository.findByStatusAndTypeAndRetriesLessThan(
+		List<Notification> pendingEmails = notificationRepository.findByStatusAndTypeAndRetriesLessThanAndScheduledForLessThanEqual(
 			NotificationStatus.PENDING, 
 			NotificationType.EMAIL, 
-			MAX_RETRY_LIMIT
+			MAX_RETRY_LIMIT,
+			LocalDateTime.now()
 		);
 
 		if (pendingEmails.isEmpty()) {
