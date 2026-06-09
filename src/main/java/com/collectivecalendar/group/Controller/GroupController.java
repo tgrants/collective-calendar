@@ -305,7 +305,7 @@ public class GroupController {
 			UUID groupId = UUID.fromString(id);
 
 			User currentUser = userRepository.findByUsername(principal.getUsername())
-					.orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+					.orElseThrow(() -> new RuntimeException("Pašreizējais lietotājs nav atrasts"));
 
 			UserGroup membership = userGroupRepository.findByUserId(currentUser.getUid())
 					.stream()
@@ -325,5 +325,49 @@ public class GroupController {
 		}
 
 		return "redirect:/groups";
+	}
+
+	@PostMapping("/groups/{gid}/members/{uid}/promote")
+	public String promoteMember(
+		@PathVariable String gid,
+		@PathVariable String uid,
+		@AuthenticationPrincipal UserDetails principal,
+		RedirectAttributes redirectAttributes
+	) {
+		try {
+			UUID groupId = UUID.fromString(gid);
+			UUID targetUserId = UUID.fromString(uid);
+
+			User currentUser = userRepository.findByUsername(principal.getUsername())
+					.orElseThrow(() -> new RuntimeException("Pašreizējais lietotājs nav atrasts"));
+
+			UserGroup currentMembership = userGroupRepository.findByUserId(currentUser.getUid())
+					.stream()
+					.filter(ug -> ug.getGroupId().equals(groupId))
+					.findFirst()
+					.orElseThrow(() -> new RuntimeException("Tu neesi šīs grupas dalībnieks"));
+
+			if (!"EDITOR".equals(normalizeRole(currentMembership.getRole()))) {
+				throw new IllegalStateException("Tikai redaktori var piešķirt lomas.");
+			}
+
+			UserGroup targetMembership = userGroupRepository.findByGroupId(groupId)
+					.stream()
+					.filter(ug -> ug.getUserId().equals(targetUserId))
+					.findFirst()
+					.orElseThrow(() -> new RuntimeException("Lietotājs nav šīs grupas dalībnieks"));
+
+			if (!"VIEWER".equals(normalizeRole(targetMembership.getRole()))) {
+				throw new IllegalStateException("Lietotājs jau ir redaktors.");
+			}
+
+			targetMembership.setRole("EDITOR");
+			userGroupRepository.save(targetMembership);
+			redirectAttributes.addFlashAttribute("successMessage", "Lietotājam piešķirta redaktora loma.");
+		} catch (RuntimeException e) {
+			redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+		}
+
+		return "redirect:/groups/" + gid;
 	}
 }
