@@ -1,16 +1,23 @@
 package com.collectivecalendar.notification.scheduler;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.collectivecalendar.model.Event;
 import com.collectivecalendar.model.Notification;
 import com.collectivecalendar.model.NotificationStatus;
 import com.collectivecalendar.model.NotificationType;
+import com.collectivecalendar.model.Notify;
+import com.collectivecalendar.model.User;
 import com.collectivecalendar.notification.service.EmailSenderService;
+import com.collectivecalendar.repository.EventRepository;
 import com.collectivecalendar.repository.NotificationRepository;
+import com.collectivecalendar.repository.NotifyRepository;
+import com.collectivecalendar.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,18 +29,19 @@ public class NotificationScheduler {
 
 	private final NotificationRepository notificationRepository;
 	private final EmailSenderService emailSenderService;
-	// TODO: Inject NotifyRepository when created to fetch notification-specific overrides
-	// private final NotifyRepository notifyRepository;
+	private final NotifyRepository notifyRepository;
+	private final UserRepository userRepository;
+	private final EventRepository eventRepository;
 
 	private static final int MAX_RETRY_LIMIT = 3;
 
-	@Scheduled(cron = "0 */1 * * * *") // Every minute
+	@Scheduled(cron = "0 */1 * * * *") // Runs every minute
 	@Transactional
 	public void processPendingEmailQueue() {
 		List<Notification> pendingEmails = notificationRepository.findByStatusAndTypeAndRetriesLessThan(
-				NotificationStatus.PENDING, 
-				NotificationType.EMAIL, 
-				MAX_RETRY_LIMIT
+			NotificationStatus.PENDING, 
+			NotificationType.EMAIL, 
+			MAX_RETRY_LIMIT
 		);
 
 		if (pendingEmails.isEmpty()) {
@@ -44,32 +52,59 @@ public class NotificationScheduler {
 
 		for (Notification notification : pendingEmails) {
 			try {
-				// Check if notify -> notify_email is TRUE for this specific notification
-				boolean isEmailNotificationAllowed = true;
+				UUID userId = notification.getNotifyUserUid();
+				User user = userRepository.findById(userId).orElse(null);
 				
-				if (notification.getNotifyUid() != null) {
-					// TODO: Fetch from notify table using notification.getNotifyUid()
-					// NotifyConfig notifyConfig = notifyRepository.findById(notification.getNotifyUid()).orElse(null);
-					// if (notifyConfig != null) { isEmailNotificationAllowed = notifyConfig.isNotifyEmail(); }
-				}
-
-				if (!isEmailNotificationAllowed) {
-					log.info("Skipping notification {} because notify_email is disabled for this configuration row.", notification.getUid());
-					notification.setStatus(NotificationStatus.FAILED); // Fail it so it doesn't loop forever
+				if (user == null) {
+					log.error("Skipping notification {}: Target user {} does not exist.", notification.getUid(), userId);
+					notification.setStatus(NotificationStatus.FAILED);
 					continue;
 				}
 
-				// TODO: Fetch user entity data via notification.getNotifyUserUid()
-				String recipientEmail = "user-email-placeholder@example.local"; 
-				String username = "User";
+				if (!user.isVerified()) {
+					log.info("Skipping notification {}: User's email ({}) is not verified.", notification.getUid(), user.getEmail());
+					notification.setStatus(NotificationStatus.FAILED);
+					continue;
+				}
 
-				// TODO: Fetch event entity data via notification.getNotifyEventUid()
-				String eventName = "Upcoming Calendar Event";
+				if (!user.isVerified()) {
+					log.info("Skipping notification {}: User {} has disabled global calendar notifications.", notification.getUid(), user.getUsername());
+					notification.setStatus(NotificationStatus.FAILED);
+					continue;
+				}
+
+				boolean isEmailNotificationAllowed = true;
+				if (notification.getNotifyUid() != null) {
+					Notify notifyConfig = notifyRepository.findById(notification.getNotifyUid()).orElse(null);
+					if (notifyConfig != null) {
+						isEmailNotificationAllowed = notifyConfig.isNotifyEmail();
+					}
+				}
+
+				if (!isEmailNotificationAllowed) {
+					log.info("Skipping notification {}: notify_email is disabled for this specific event configuration.", notification.getUid());
+					notification.setStatus(NotificationStatus.FAILED);
+					continue;
+				}
+
+				UUID eventId = notification.getNotifyEventUid();
+				Event event = eventRepository.findById(eventId).orElse(null);
+				
+				if (event == null) {
+					log.error("Skipping notification {}: Reference event {} does not exist.", notification.getUid(), eventId);
+					notification.setStatus(NotificationStatus.FAILED);
+					continue;
+				}
+
+				String recipientEmail = user.getEmail();
+				String username = user.getUsername();
+				String eventName = event.getName();
 
 				String subject = "Calendar Alert: " + eventName;
 				String htmlBody = String.format(
-						"<h2>Hello %s,</h2><p>You have an upcoming event: <strong>%s</strong>.</p>", 
-						username, eventName
+					"<h2>Hello %s,</h2><p>You have an upcoming event: <strong>%s</strong>.</p>" +
+					"<p>Start Time: %s</p>", 
+					username, eventName, event.getStartTime()
 				);
 
 				boolean isSuccess = emailSenderService.sendHtmlEmail(recipientEmail, subject, htmlBody);

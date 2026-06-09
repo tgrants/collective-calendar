@@ -44,16 +44,6 @@
 							</span>
 						</div>
 					</div>
-
-					<div style="text-align:right">
-						<div class="notif-time">
-							<i class="bi bi-clock me-1"></i>
-							<span th:text="${#temporals.format(notif.createdAt, 'dd.MM HH:mm')}">01.01 10:00</span>
-						</div>
-						<span class="badge mt-1"
-							  th:classappend="${notif.status == 'SENT'} ? 'bg-success' : (${notif.status == 'FAILED'} ? 'bg-danger' : 'bg-secondary')"
-							  th:text="${notif.status}">STATUS</span>
-					</div>
 				</div>
 			</div>
 		</div>
